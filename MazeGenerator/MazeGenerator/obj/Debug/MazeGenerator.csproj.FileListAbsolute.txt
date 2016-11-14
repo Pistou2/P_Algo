@@ -5,3 +5,8 @@ F:\Projet\P_Algo\Code\Git\MazeGenerator\MazeGenerator\bin\Debug\MazeGenerator.pd
 F:\Projet\P_Algo\Code\Git\MazeGenerator\MazeGenerator\obj\Debug\MazeGenerator.csprojResolveAssemblyReference.cache
 F:\Projet\P_Algo\Code\Git\MazeGenerator\MazeGenerator\obj\Debug\MazeGenerator.exe
 F:\Projet\P_Algo\Code\Git\MazeGenerator\MazeGenerator\obj\Debug\MazeGenerator.pdb
+C:\Users\merkya\Desktop\P_34-Git\MazeGenerator\MazeGenerator\bin\Debug\MazeGenerator.exe
+C:\Users\merkya\Desktop\P_34-Git\MazeGenerator\MazeGenerator\bin\Debug\MazeGenerator.pdb
+C:\Users\merkya\Desktop\P_34-Git\MazeGenerator\MazeGenerator\obj\Debug\MazeGenerator.csprojResolveAssemblyReference.cache
+C:\Users\merkya\Desktop\P_34-Git\MazeGenerator\MazeGenerator\obj\Debug\MazeGenerator.exe
+C:\Users\merkya\Desktop\P_34-Git\MazeGenerator\MazeGenerator\obj\Debug\MazeGenerator.pdb
