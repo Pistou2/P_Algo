@@ -19,9 +19,9 @@ namespace MazeGenerator
 
         static void Main(string[] args)
         {
-            int[,] temp1 = new int[,] { { 15, 15 }, { 15, 15 }, { 15, 15 } };
+            Maze maze = new Maze(10, 10);
 
-            printMaze(temp1);
+
             Console.ReadLine();
         }
 
