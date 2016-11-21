@@ -24,7 +24,7 @@ namespace MazeGenerator
 
             Console.Clear();
 
-            printMaze(temp);
+            printMaze(temp,0,0);
             Console.ReadLine();
         }
 
@@ -141,6 +141,16 @@ namespace MazeGenerator
                 }
             }
             #endregion
+        }
+
+        public static void printMaze(int[,] _maze, int _lastX, int _lastY)
+        {
+            printMaze(_maze);
+
+            Console.SetCursorPosition(_lastX * SIZE + 1, _lastY * SIZE + 1);
+            Console.BackgroundColor = ConsoleColor.Red;
+            Console.Write(" ");
+            Console.BackgroundColor = ConsoleColor.Gray;
         }
     }
 }
