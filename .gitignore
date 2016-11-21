@@ -1,1 +1,6 @@
 local.cs
+.suo
+*.exe
+*.cache
+*.Cache
+*.pdb
