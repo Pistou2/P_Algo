@@ -20,11 +20,9 @@ namespace MazeGenerator
         static void Main(string[] args)
         {
             Maze maze = new Maze(10, 10);
-            int[,] temp = new int[,] { { 15, 15 }, { 15, 15 }, { 15, 15 } };
 
-            Console.Clear();
-
-            printMaze(temp,0,0);
+            printMaze(maze.maze);
+            
             Console.ReadLine();
         }
 
@@ -37,7 +35,7 @@ namespace MazeGenerator
                 for (int y = 0; y < _maze.GetLength(1); y++)
                 {
                     //if the first bit is lit
-                    if ((_maze[x, y] & 1) == 1)
+                    if ((_maze[x, y] & 1) == 0)
                     {
                         //write the top wall
                         Console.SetCursorPosition(x * SIZE + 1, y * SIZE);
@@ -45,7 +43,7 @@ namespace MazeGenerator
                     }
 
                     //if the forth bit is lit
-                    if ((_maze[x, y] & 8) == 8)
+                    if ((_maze[x, y] & 8) == 0)
                     {
                         //write the front wall
                         Console.SetCursorPosition(x * SIZE, y * SIZE + 1);
@@ -57,7 +55,7 @@ namespace MazeGenerator
                     {
                         //sets the bottom wall if needed
                         //if the second bit is lit
-                        if ((_maze[x, y] & 2) == 2)
+                        if ((_maze[x, y] & 2) == 0)
                         {
                             //write the bottom wall
                             Console.SetCursorPosition(x * SIZE + 1, y * SIZE + 2);
@@ -71,7 +69,7 @@ namespace MazeGenerator
                         //sets the right wall if needed
 
                         //if the third bit is lit
-                        if ((_maze[x, y] & 4) == 4)
+                        if ((_maze[x, y] & 4) == 0)
                         {
                             //write the right wall
                             Console.SetCursorPosition(x * SIZE + 2, y * SIZE + 1);
@@ -147,6 +145,7 @@ namespace MazeGenerator
         {
             printMaze(_maze);
 
+            Console.Clear();
             Console.SetCursorPosition(_lastX * SIZE + 1, _lastY * SIZE + 1);
             Console.BackgroundColor = ConsoleColor.Red;
             Console.Write(" ");
