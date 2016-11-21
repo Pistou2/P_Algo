@@ -150,7 +150,7 @@ namespace MazeGenerator
             Console.SetCursorPosition(_lastX * SIZE + 1, _lastY * SIZE + 1);
             Console.BackgroundColor = ConsoleColor.Red;
             Console.Write(" ");
-            Console.BackgroundColor = ConsoleColor.Gray;
+            Console.BackgroundColor = ConsoleColor.Black;
         }
     }
 }
