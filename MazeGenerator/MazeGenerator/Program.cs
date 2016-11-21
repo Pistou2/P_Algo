@@ -20,14 +20,17 @@ namespace MazeGenerator
         static void Main(string[] args)
         {
             Maze maze = new Maze(10, 10);
+            int[,] temp = new int[,] { { 15, 15 }, { 15, 15 }, { 15, 15 } };
 
+            Console.Clear();
 
+            printMaze(temp);
             Console.ReadLine();
         }
 
         public static void printMaze(int[,] _maze)
         {
-            Console.SetCursorPosition(0, 0);
+            #region cases
             //go through all the cases
             for (int x = 0; x < _maze.GetLength(0); x++)
             {
@@ -45,12 +48,12 @@ namespace MazeGenerator
                     if ((_maze[x, y] & 8) == 8)
                     {
                         //write the front wall
-                        Console.SetCursorPosition(x  * SIZE , y * SIZE + 1);
+                        Console.SetCursorPosition(x * SIZE, y * SIZE + 1);
                         Console.Write(WALL_STRINGS[1]);
                     }
 
                     //if this is the last case of the row
-                    if(y == _maze.GetLength(1) - 1)
+                    if (y == _maze.GetLength(1) - 1)
                     {
                         //sets the bottom wall if needed
                         //if the second bit is lit
@@ -77,7 +80,67 @@ namespace MazeGenerator
                     }
                 }
             }
+            #endregion
 
+            #region Corners
+            //write all the corners
+            Console.SetCursorPosition(0, 0);
+            Console.Write(WALL_STRINGS[6]);
+
+            Console.SetCursorPosition(_maze.GetLength(0) * SIZE, 0);
+            Console.Write(WALL_STRINGS[7]);
+
+            Console.SetCursorPosition(0, _maze.GetLength(1) * SIZE);
+            Console.Write(WALL_STRINGS[8]);
+
+            Console.SetCursorPosition(_maze.GetLength(0) * SIZE, _maze.GetLength(1) * SIZE);
+            Console.Write(WALL_STRINGS[9]);
+
+            #endregion
+
+            #region Borders
+            //go thgough all the visible chars
+            for (int x = 0; x < _maze.GetLength(0) * SIZE; x++)
+            {
+                for (int y = 0; y < _maze.GetLength(1) * SIZE; y++)
+                {
+                    //check what string need to be wroten
+                    //left walls                   
+                    if (x == 0 && y > 0 && y % 2 == 0)
+                    {
+                        Console.SetCursorPosition(x, y);
+                        Console.Write(WALL_STRINGS[2]);
+                    }
+
+                    //right walls
+                    else if (x == _maze.GetLength(0) * SIZE - 1 && y > 0 && y % 2 == 0)
+                    {
+                        Console.SetCursorPosition(x + 1, y);
+                        Console.Write(WALL_STRINGS[3]);
+                    }
+
+                    //top walls
+                    else if (y == 0 && x > 0 && x % 2 == 0)
+                    {
+                        Console.SetCursorPosition(x, y);
+                        Console.Write(WALL_STRINGS[4]);
+                    }
+
+                    //bottom walls
+                    else if (y == _maze.GetLength(1) * SIZE - 1 && x > 0 && x % 2 == 0)
+                    {
+                        Console.SetCursorPosition(x, y + 1);
+                        Console.Write(WALL_STRINGS[5]);
+                    }
+                    //corner
+                    else if (x > 0 && y > 0 && x < _maze.GetLength(0) * SIZE - 1 && y < _maze.GetLength(1) * SIZE - 1 && x % 2 == 0 && y % 2 == 0)
+                    {
+                        Console.SetCursorPosition(x, y);
+                        Console.Write(WALL_STRINGS[10]);
+                    }
+                }
+            }
+            #endregion
         }
     }
 }
