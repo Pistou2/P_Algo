@@ -56,39 +56,12 @@ namespace MazeGenerator
 
             if (mustDrawEntry)
             {
+                int topDoorPos = rnd.Next(width);
 
-            }
-        }
+                int bottomDoorPod = rnd.Next(width);
 
-        private void PrintMaze(int mazePositionX, int mazePositionY, int[,] mazeToShow)
-        {
-            Console.Write(" ");
-
-            for (int i = 0; i < width * 2 - 1; i++)
-            {
-                Console.Write("_");
-            }
-
-            Console.WriteLine();
-
-            for (int y = 0; y < height; y++)
-            {
-                Console.Write("|");
-
-                for (int x = 0; x < width; x++)
-                {
-                    Console.Write(((mazeToShow[y, x] & 2) != 0) ? " " : "_");
-
-                    if ((maze[x, y] & 4) != 0)
-                        if (x + 1 < mazeToShow.GetLength(1))
-                            Console.Write(((mazeToShow[y, x] | mazeToShow[y, x + 1]) & 2) != 0 ? " " : "_");
-                        else
-                            Console.Write(((mazeToShow[y, x]) & 2) != 0 ? " " : "_");
-                    else
-                        Console.Write("|");
-                }
-
-                Console.WriteLine();
+                mazeGenerated[topDoorPos, 0] |= NSEW[0, 0];
+                mazeGenerated[bottomDoorPod, height - 1] |= NSEW[1, 0];
             }
         }
     }
