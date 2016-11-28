@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace MazeGenerator
@@ -166,9 +167,10 @@ namespace MazeGenerator
 
             SolveMaze("bottom", firstPositionX, 0, solvedMaze, ref isEnded);
 
-            for (int i = 0; i < solvedMaze.Count; i++)
+            for (int i = solvedMaze.Count - 1; i >= 0; i--)
             {
                 Program.printMaze(maze, solvedMaze[i][0], solvedMaze[i][1]);
+                Thread.Sleep(50);
             }
         }
 

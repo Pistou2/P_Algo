@@ -20,7 +20,7 @@ namespace MazeGenerator
 
         static void Main(string[] args)
         {
-            Console.SetWindowSize(210, 123);
+            Console.SetWindowSize(208, 123);
 
             Maze maze = new Maze(100, 100);
             Console.Clear();
