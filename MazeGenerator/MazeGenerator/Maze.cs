@@ -84,7 +84,8 @@ namespace MazeGenerator
         /// </summary>
         /// <param name="width">Largeur du labyrinthe voulu</param>
         /// <param name="height">Hauteur du labyrinthe voulu</param>
-        public Maze(int width, int height)
+        /// <param name="stepByStep">Lance le labyrinthe en mode "Démo", et montre chaque étape de la génération</param>
+        public Maze(int width, int height, int? stepByStepLength = null)
         {
             // Enregistre la largeur et la hauteur
             this.width = width;
@@ -94,17 +95,23 @@ namespace MazeGenerator
             maze = new int[width, height];
 
             // Génère le labyrinthe
-            GenerateMaze(maze);
+            //L'affiche une première fois pour un step by step
+            if (stepByStepLength != null)
+            {
+                Program.printMaze(maze);
+            }
+            GenerateMaze(maze, stepByStepLength);
         }
 
         /// <summary>
         /// Génère un labyrinthe
         /// </summary>
         /// <param name="mazeToGenerate">Labyrinthe à générer</param>
-        private void GenerateMaze(int[,] mazeToGenerate)
+        /// <param name="stepByStep">Lance le labyrinthe en mode "Démo", et montre chaque étape de la génération</param>
+        private void GenerateMaze(int[,] mazeToGenerate, int? stepByStepLength = null)
         {
             // Génère le labyrinthe
-            GenerateMaze(0, 0, mazeToGenerate);
+            GenerateMaze(0, 0, mazeToGenerate, stepByStepLength);
 
             // Choisi la position de l'entrée et de la sortie du labyrinthe
             int topDoorPos = random.Next(width);
@@ -121,7 +128,8 @@ namespace MazeGenerator
         /// <param name="currentX">Position à l'hotizontal de la dernière case visitée</param>
         /// <param name="currentY">Position à la vertical de la dernière case visitée</param>
         /// <param name="mazeToGenerate">Labyrinthe à génèrer</param>
-        private void GenerateMaze(int currentX, int currentY, int[,] mazeToGenerate)
+        /// <param name="stepByStep">Lance le labyrinthe en mode "Démo", et montre chaque étape de la génération</param>
+        private void GenerateMaze(int currentX, int currentY, int[,] mazeToGenerate, int? stepByStepLength)
         {
             // Crée une liste avec les différentes directions possible
             List<string> directions = new List<string> { TOP, BOTTOM, LEFT, RIGHT };
@@ -146,8 +154,16 @@ namespace MazeGenerator
                     // Change la valeur de la case suivantes pour indiquer qu'une porte a été crée dans la direction (inversée par rapport à la case actuelle)
                     mazeToGenerate[nextX, nextY] |= TBRL[REVERT_TBRL[direction]];
 
+                    //Step by step
+                    if (stepByStepLength != null)
+                    {
+                        //écrit la case
+                        Program.printMaze(mazeToGenerate, new int[] { currentX, currentY });
+                        System.Threading.Thread.Sleep((int)stepByStepLength);
+                    }
+
                     // Continue de génèrer le labyrinthe avec la case suivante
-                    GenerateMaze(nextX, nextY, mazeToGenerate);
+                    GenerateMaze(nextX, nextY, mazeToGenerate, stepByStepLength);
                 }
 
                 // Supprime la direction pour de celle restante

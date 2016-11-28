@@ -31,9 +31,24 @@ namespace MazeGenerator
             Console.ReadLine();
         }
 
-        public static void printMaze(int[,] _maze)
+        public static void printMaze(int[,] _maze, int[] _caseCorrdsForMonoPrint = null)
         {
-            #region cases + case corners
+            //check if this is a monoPrint (only generate 1 case)
+            if (_caseCorrdsForMonoPrint != null)
+            {
+                //clear the case
+                for (int x = 0; x <= SIZE; x++)
+                {
+                    for (int y = 0; y <= SIZE; y++)
+                    {
+                        Console.SetCursorPosition(_caseCorrdsForMonoPrint[0] * SIZE + x, _caseCorrdsForMonoPrint[1] * SIZE + y);
+                        Console.Write(" ");
+                    }
+                }
+
+            }
+
+            #region cases
 
             bool[] tempCornerWalls = new bool[4];
             string tempCornerText;
@@ -42,6 +57,13 @@ namespace MazeGenerator
             {
                 for (int y = 0; y < _maze.GetLength(1); y++)
                 {
+                    //if this is a monoPrint, rewrite only the case in question
+                    if (_caseCorrdsForMonoPrint != null)
+                    {
+                        x = _caseCorrdsForMonoPrint[0];
+                        y = _caseCorrdsForMonoPrint[1];
+                    }
+
                     //if the first bit is lit
                     if ((_maze[x, y] & 1) == 0)
                     {
@@ -58,8 +80,8 @@ namespace MazeGenerator
                         Console.Write(WALL_STRINGS[1]);
                     }
 
-                    //if this is the last case of the row
-                    if (y == _maze.GetLength(1) - 1)
+                    //if this is the last case of the row, or a monoPrint
+                    if (y == _maze.GetLength(1) - 1 | _caseCorrdsForMonoPrint != null)
                     {
                         //sets the bottom wall if needed
                         //if the second bit is lit
@@ -71,8 +93,8 @@ namespace MazeGenerator
                         }
                     }
 
-                    //if this is the last row
-                    if (x == _maze.GetLength(0) - 1)
+                    //if this is the last row, or a monoPrint
+                    if (x == _maze.GetLength(0) - 1 | _caseCorrdsForMonoPrint != null)
                     {
                         //sets the right wall if needed
 
@@ -85,20 +107,56 @@ namespace MazeGenerator
                         }
                     }
 
+                    //get out of the fors directly if this is a monoPrint
+                    if (_caseCorrdsForMonoPrint != null)
+                    {
+                        x = _maze.GetLength(0);
+                        y = _maze.GetLength(1);
+                    }
 
-                    //corners
-                    if (x > 0 && y > 0)
+                }
+            }
+            #endregion
+
+            #region Case Corners
+            int xCorner, yCorner, maxXCorner, maxYCorner;
+            //if this is a monoPrint, only handle the corners around the changed case
+            if (_caseCorrdsForMonoPrint != null)
+            {
+                xCorner = _caseCorrdsForMonoPrint[0];
+                yCorner = _caseCorrdsForMonoPrint[1];
+
+                maxXCorner = xCorner + 1;
+                maxYCorner = yCorner + 1;
+            }
+            else
+            {
+                xCorner = 0;
+                yCorner = 0;
+
+                maxXCorner = _maze.GetLength(0);
+                maxYCorner = _maze.GetLength(1);
+            }
+
+
+            //go through all the cases
+            for (xCorner; xCorner < maxXCorner; xCorner++)
+            {
+                for (yCorner = 0; yCorner < maxYCorner; yCorner++)
+                {
+
+                    if (xCorner > 0 && yCorner > 0)
                     {
 
                         //TODO
-                        Console.SetCursorPosition(x * SIZE, y * SIZE);
+                        Console.SetCursorPosition(xCorner * SIZE, yCorner * SIZE);
 
 
                         //set the temp bool (Top, bottom, right, left)
-                        tempCornerWalls[0] = ((_maze[x, y - 1] & 8) == 0);
-                        tempCornerWalls[1] = ((_maze[x, y] & 8) == 0);
-                        tempCornerWalls[2] = ((_maze[x, y] & 1) == 0);
-                        tempCornerWalls[3] = ((_maze[x - 1, y] & 1) == 0);
+                        tempCornerWalls[0] = ((_maze[xCorner, yCorner - 1] & 8) == 0);
+                        tempCornerWalls[1] = ((_maze[xCorner, yCorner] & 8) == 0);
+                        tempCornerWalls[2] = ((_maze[xCorner, yCorner] & 1) == 0);
+                        tempCornerWalls[3] = ((_maze[xCorner - 1, yCorner] & 1) == 0);
 
                         #region Char test
 
@@ -282,7 +340,7 @@ namespace MazeGenerator
             }
             #endregion
 
-            #region Corners
+            #region Tab Corners
             //write all the corners
             Console.SetCursorPosition(0, 0);
             Console.Write(WALL_STRINGS[6]);
@@ -311,7 +369,7 @@ namespace MazeGenerator
                         Console.SetCursorPosition(x, y);
                         //check if there's a wall at right to write the correct char
 
-                        if ((_maze[x / SIZE, y / SIZE -1] & 2) == 0)
+                        if ((_maze[x / SIZE, y / SIZE - 1] & 2) == 0)
                         {
                             Console.Write(WALL_STRINGS[2]);
                         }
@@ -360,7 +418,7 @@ namespace MazeGenerator
                         Console.SetCursorPosition(x, y + 1);
                         //check if there's a wall on top to write the correct char
 
-                        if ((_maze[x / SIZE, y / SIZE] & 8) ==0 )
+                        if ((_maze[x / SIZE, y / SIZE] & 8) == 0)
                         {
                             Console.Write(WALL_STRINGS[5]);
                         }
