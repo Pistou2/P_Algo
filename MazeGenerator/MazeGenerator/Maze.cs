@@ -11,14 +11,16 @@ namespace MazeGenerator
         private int width;
         private int height;
 
-        private int[] differenceX = new int[] { 1, -1, 0, 0 };
-        private int[] differenceY = new int[] { 0, 0, 1, -1 };
+        private int[] differenceX = new int[] { 0, 0, 1, -1 };
+        private int[] differenceY = new int[] { -1, 1, 0, 0 };
 
-        private int[,] maze;
+        private int[,] NSEW = new int[,] { { 1, 2, 4, 8 }, { 2, 1, 8, 4 } };
+
+        public int[,] maze;
 
         Random rnd;
 
-        public Maze (int width, int height)
+        public Maze(int width, int height)
         {
             this.width = width;
             this.height = height;
@@ -28,10 +30,9 @@ namespace MazeGenerator
             rnd = new Random();
 
             GenerateMaze(0, 0, maze);
-            PrintMaze(0, 0, maze);
         }
 
-        private void GenerateMaze(int lastX, int lastY, int[,] mazeGenerated)
+        private void GenerateMaze(int lastX, int lastY, int[,] mazeGenerated, bool mustDrawEntry = true)
         {
             List<int> directions = new List<int> { 0, 1, 2, 3 };
 
@@ -43,12 +44,19 @@ namespace MazeGenerator
 
                 if (nextX >= 0 && nextX < width && nextY >= 0 && nextY < height && mazeGenerated[nextX, nextY] == 0)
                 {
-                    mazeGenerated[lastX, lastY] |= Convert.ToInt32(Math.Pow(2, directions[randomDir]));
-                    mazeGenerated[nextX, nextY] |= Convert.ToInt32(Math.Pow(2, 3 - directions[randomDir]));
-                    GenerateMaze(nextX, nextY, mazeGenerated);
+                    mazeGenerated[lastX, lastY] |= NSEW[0,directions[randomDir]];
+
+                    mazeGenerated[nextX, nextY] |= NSEW[1, directions[randomDir]];
+
+                    GenerateMaze(nextX, nextY, mazeGenerated, false);
                 }
 
                 directions.RemoveAt(randomDir);
+            }
+
+            if (mustDrawEntry)
+            {
+
             }
         }
 
@@ -69,10 +77,13 @@ namespace MazeGenerator
 
                 for (int x = 0; x < width; x++)
                 {
-                    Console.Write(((mazeToShow[x, y] & 2) != 0) ? " " : "_");
+                    Console.Write(((mazeToShow[y, x] & 2) != 0) ? " " : "_");
 
                     if ((maze[x, y] & 4) != 0)
-                        Console.Write(((mazeToShow[x, y] | mazeToShow[x, y]) & 2) != 0 ? " " : "_");
+                        if (x + 1 < mazeToShow.GetLength(1))
+                            Console.Write(((mazeToShow[y, x] | mazeToShow[y, x + 1]) & 2) != 0 ? " " : "_");
+                        else
+                            Console.Write(((mazeToShow[y, x]) & 2) != 0 ? " " : "_");
                     else
                         Console.Write("|");
                 }
