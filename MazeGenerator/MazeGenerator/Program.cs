@@ -20,15 +20,15 @@ namespace MazeGenerator
 
         static void Main(string[] args)
         {
-            while (true)
-            {
-                Maze maze = new Maze(10, 10);
+            Console.SetWindowSize(210, 123);
 
-                printMaze(maze.maze);
+            Maze maze = new Maze(100, 100);
+            Console.Clear();
 
-                Console.ReadLine();
-                Console.Clear();
-            }
+            printMaze(maze.maze);
+
+            maze.SolveMaze();
+            Console.ReadLine();
         }
 
         public static void printMaze(int[,] _maze)
@@ -379,9 +379,7 @@ namespace MazeGenerator
         /// </summary>
         public static void printMaze(int[,] _maze, int _lastX, int _lastY)
         {
-            printMaze(_maze);
-
-            Console.Clear();
+            //printMaze(_maze);
             Console.SetCursorPosition(_lastX * SIZE + 1, _lastY * SIZE + 1);
             Console.BackgroundColor = ConsoleColor.Red;
             Console.Write(" ");

@@ -147,5 +147,88 @@ namespace MazeGenerator
                 directions.RemoveAt(randomDir);
             }
         }
+
+        public void SolveMaze()
+        {
+            int firstPositionX = 0;
+
+            for (int i = 0; i < maze.GetLength(0); i++)
+            {
+                if ((maze[i, 0] & TBRL["top"]) == TBRL["top"])
+                {
+                    firstPositionX = i;
+                }
+            }
+
+            List<int[]> solvedMaze = new List<int[]>();
+
+            bool isEnded = false;
+
+            SolveMaze("bottom", firstPositionX, 0, solvedMaze, ref isEnded);
+
+            for (int i = 0; i < solvedMaze.Count; i++)
+            {
+                Program.printMaze(maze, solvedMaze[i][0], solvedMaze[i][1]);
+            }
+        }
+
+        private void SolveMaze(string lastDirection, int currentX, int currentY, List<int[]> solvedList, ref bool isEnded)
+        {
+            List<string> directions = new List<string>();
+
+            switch (lastDirection)
+            {
+                case "top":
+                    directions.Add("right");
+                    directions.Add("top");
+                    directions.Add("left");
+                    break;
+
+                case "bottom":
+                    directions.Add("left");
+                    directions.Add("bottom");
+                    directions.Add("right");
+                    break;
+
+                case "right":
+                    directions.Add("bottom");
+                    directions.Add("right");
+                    directions.Add("top");
+                    break;
+
+                case "left":
+                    directions.Add("top");
+                    directions.Add("left");
+                    directions.Add("bottom");
+                    break;
+            }
+
+            while(directions.Count != 0 && !isEnded)
+            {
+                if ((maze[currentX, currentY] & TBRL[directions[0]]) == TBRL[directions[0]])
+                {
+                    int nextX = currentX + differenceX[directions[0]];
+                    int nextY = currentY + differenceY[directions[0]];
+
+                    if (nextX >= 0 && nextX < maze.GetLength(0) && nextY >= 0 && nextY < maze.GetLength(1))
+                    {
+                        SolveMaze(directions[0], nextX, nextY, solvedList, ref isEnded);
+                    }
+
+                    else
+                    {
+                        isEnded = true;
+                    }
+                }
+
+                directions.RemoveAt(0);
+            }
+
+
+            if (isEnded)
+            {
+                solvedList.Add(new int[] { currentX, currentY });
+            }
+        }
     }
 }
