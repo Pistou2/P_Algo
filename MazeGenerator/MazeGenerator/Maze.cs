@@ -8,60 +8,143 @@ namespace MazeGenerator
 {
     class Maze
     {
+        /// <summary>
+        /// Largeur du labyrinthe
+        /// </summary>
         private int width;
+
+        /// <summary>
+        /// Hauteur du labyrinthe
+        /// </summary>
         private int height;
 
-        private int[] differenceX = new int[] { 0, 0, 1, -1 };
-        private int[] differenceY = new int[] { -1, 1, 0, 0 };
+        /// <summary>
+        /// Dictionnaire avec la différence en case horizontalement suivant la direction voulue
+        /// </summary>
+        private static Dictionary<string, int> differenceX = new Dictionary<string, int>()
+        {
+            { "top", 0 },
+            { "bottom", 0 },
+            { "right", 1 },
+            { "left", -1 }
+        };
 
-        private int[,] NSEW = new int[,] { { 1, 2, 4, 8 }, { 2, 1, 8, 4 } };
+        /// <summary>
+        /// Dictionnaire avec la différence en case verticalement suivant la direction voulue
+        /// </summary>
+        private static Dictionary<string, int> differenceY = new Dictionary<string, int>()
+        {
+            { "top", -1 },
+            { "bottom", 1 },
+            { "right", 0 },
+            { "left", 0 }
+        };
 
+        /// <summary>
+        /// Dictionnaire avec les valeurs pour stocker les portes
+        /// </summary>
+        private static Dictionary<string, int> TBRL = new Dictionary<string, int>()
+        {
+            { "top", 1 /*0001*/ },
+            { "bottom", 2 /*0010*/ },
+            { "right", 4  /*0100*/ },
+            { "left", 8 /*1000*/ }
+        };
+
+        /// <summary>
+        /// Dictionnaire avec l'inverse des directions des portes
+        /// </summary>
+        private static Dictionary<string, string> REVERT_TBRL = new Dictionary<string, string>()
+        {
+            { "top", "bottom" },
+            { "bottom", "top" },
+            { "right", "left" },
+            { "left", "right" }
+        };
+
+        /// <summary>
+        /// Labyrinthe généré
+        /// </summary>
         public int[,] maze;
 
-        Random rnd;
+        /// <summary>
+        /// Random pour généré le labyrinthe
+        /// </summary>
+        Random random = new Random();
 
+        /// <summary>
+        /// Constructeur de la classe
+        /// </summary>
+        /// <param name="width">Largeur du labyrinthe voulu</param>
+        /// <param name="height">Hauteur du labyrinthe voulu</param>
         public Maze(int width, int height)
         {
+            // Enregistre la largeur et la hauteur
             this.width = width;
             this.height = height;
 
+            // Crée le tableau du labyrinthe
             maze = new int[width, height];
 
-            rnd = new Random();
-
-            GenerateMaze(0, 0, maze);
+            // Génère le labyrinthe
+            GenerateMaze(maze);
         }
 
-        private void GenerateMaze(int lastX, int lastY, int[,] mazeGenerated, bool mustDrawEntry = true)
+        /// <summary>
+        /// Génère un labyrinthe
+        /// </summary>
+        /// <param name="mazeToGenerate">Labyrinthe à générer</param>
+        private void GenerateMaze(int[,] mazeToGenerate)
         {
-            List<int> directions = new List<int> { 0, 1, 2, 3 };
+            // Génère le labyrinthe
+            GenerateMaze(0, 0, mazeToGenerate);
 
+            // Choisi la position de l'entrée et de la sortie du labyrinthe
+            int topDoorPos = random.Next(width);
+            int bottomDoorPod = random.Next(width);
+
+            // Enregistre la porte à la bonne position
+            mazeToGenerate[topDoorPos, 0] |= TBRL["top"];
+            mazeToGenerate[bottomDoorPod, height - 1] |= TBRL["bottom"];
+        }
+
+        /// <summary>
+        /// Génère un labyrinthe avec la méthode de l'exploration exhaustive
+        /// </summary>
+        /// <param name="currentX">Position à l'hotizontal de la dernière case visitée</param>
+        /// <param name="currentY">Position à la vertical de la dernière case visitée</param>
+        /// <param name="mazeToGenerate">Labyrinthe à génèrer</param>
+        private void GenerateMaze(int currentX, int currentY, int[,] mazeToGenerate)
+        {
+            // Crée une liste avec les différentes directions possible
+            List<string> directions = new List<string> { "top", "bottom", "left", "right" };
+
+            // Tant qu'il y a encore des directions à regarder
             while (directions.Count != 0)
             {
-                int randomDir = rnd.Next(directions.Count);
-                int nextX = lastX + differenceX[directions[randomDir]];
-                int nextY = lastY + differenceY[directions[randomDir]];
+                // Choisi aléatoirement une des directions restantes
+                int randomDir = random.Next(directions.Count);
+                string direction = directions[randomDir];
 
-                if (nextX >= 0 && nextX < width && nextY >= 0 && nextY < height && mazeGenerated[nextX, nextY] == 0)
+                // Calcule la position de la case suivante à regarder
+                int nextX = currentX + differenceX[direction];
+                int nextY = currentY + differenceY[direction];
+
+                // Si la case n'est pas au bord du labyrinthe et qu'elle n'a pas encore été visitée
+                if (nextX >= 0 && nextX < width && nextY >= 0 && nextY < height && mazeToGenerate[nextX, nextY] == 0)
                 {
-                    mazeGenerated[lastX, lastY] |= NSEW[0,directions[randomDir]];
+                    // Change la valeur de la case actuel pour indiquer qu'une porte a été crée dans la direction
+                    mazeToGenerate[currentX, currentY] |= TBRL[direction];
 
-                    mazeGenerated[nextX, nextY] |= NSEW[1, directions[randomDir]];
+                    // Change la valeur de la case suivantes pour indiquer qu'une porte a été crée dans la direction (inversée par rapport à la case actuelle)
+                    mazeToGenerate[nextX, nextY] |= TBRL[REVERT_TBRL[direction]];
 
-                    GenerateMaze(nextX, nextY, mazeGenerated, false);
+                    // Continue de génèrer le labyrinthe avec la case suivante
+                    GenerateMaze(nextX, nextY, mazeToGenerate);
                 }
 
+                // Supprime la direction pour de celle restante
                 directions.RemoveAt(randomDir);
-            }
-
-            if (mustDrawEntry)
-            {
-                int topDoorPos = rnd.Next(width);
-
-                int bottomDoorPod = rnd.Next(width);
-
-                mazeGenerated[topDoorPos, 0] |= NSEW[0, 0];
-                mazeGenerated[bottomDoorPod, height - 1] |= NSEW[1, 0];
             }
         }
     }
