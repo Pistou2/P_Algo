@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace MazeGenerator
@@ -17,15 +18,31 @@ namespace MazeGenerator
         /// </summary>
         public const int SIZE = 2;
 
+        static Mutex mut = new Mutex();
+
 
         static void Main(string[] args)
         {
+            Console.ReadLine();
+            Console.SetWindowSize(208, 123);
+            while (true)
+            {
+                Console.Clear();
+                Console.Write("Largeur: ");
+                int width = Convert.ToInt32(Console.ReadLine());
 
-            Maze maze = new Maze(100, 55, 1);
-            Console.Clear();
+                Console.Write("Hauteur: ");
+                int height = Convert.ToInt32(Console.ReadLine());
 
-            printMaze(maze.maze);
-            
+                Maze maze = new Maze(width, height, 5);
+                
+
+                MazeSolver.SolveMaze(maze.maze);
+
+                //MazeSolver.ShowSolution(MazeSolver.SolveMaze(maze.maze));
+
+                Console.ReadLine();
+            }
             Console.ReadLine();
         }
 
@@ -450,13 +467,15 @@ namespace MazeGenerator
         /// <summary>
         /// Debug Method
         /// </summary>
-        public static void printMaze(int[,] _maze, int _lastX, int _lastY)
+        public static void printMaze(/*int[,] _maze,*/ int _lastX, int _lastY, ConsoleColor color)
         {
+            mut.WaitOne();
             //printMaze(_maze);
             Console.SetCursorPosition(_lastX * SIZE + 1, _lastY * SIZE + 1);
-            Console.BackgroundColor = ConsoleColor.Red;
+            Console.BackgroundColor = color;
             Console.Write(" ");
             Console.BackgroundColor = ConsoleColor.Black;
+            mut.ReleaseMutex();
         }
     }
 }
