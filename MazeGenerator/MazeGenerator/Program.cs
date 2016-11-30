@@ -27,26 +27,29 @@ namespace MazeGenerator
             Console.SetWindowSize(208, 123);
             while (true)
             {
-                Console.Clear();
-                Console.Write("Largeur: ");
+                /*Console.Write("Largeur: ");
                 int width = Convert.ToInt32(Console.ReadLine());
 
                 Console.Write("Hauteur: ");
-                int height = Convert.ToInt32(Console.ReadLine());
+                int height = Convert.ToInt32(Console.ReadLine());*/
+                Console.Clear();
 
-                Maze maze = new Maze(width, height, 5);
-                
+                Maze maze = new Maze(/*width*/10, /*height*/10);
+
+                Console.Clear();
+
+                printMaze(maze.maze, null);                
 
                 MazeSolver.SolveMaze(maze.maze);
 
                 //MazeSolver.ShowSolution(MazeSolver.SolveMaze(maze.maze));
 
-                Console.ReadLine();
+                //Console.ReadLine();
             }
             Console.ReadLine();
         }
 
-        public static void printMaze(int[,] _maze, int[] _caseCorrdsForMonoPrint = null)
+        public static void printMaze(int[,] _maze, int[] _caseCorrdsForMonoPrint = null, int printTime = 0)
         {
             //check if this is a monoPrint (only generate 1 case)
             if (_caseCorrdsForMonoPrint != null)
@@ -58,6 +61,8 @@ namespace MazeGenerator
                     {
                         Console.SetCursorPosition(_caseCorrdsForMonoPrint[0] * SIZE + x, _caseCorrdsForMonoPrint[1] * SIZE + y);
                         Console.Write(" ");
+                        //Slow print if nedded
+                        Thread.Sleep(printTime);
                     }
                 }
 
@@ -72,6 +77,9 @@ namespace MazeGenerator
             {
                 for (int y = 0; y < _maze.GetLength(1); y++)
                 {
+                    //Slow print if nedded
+                    Thread.Sleep(printTime);
+
                     //if this is a monoPrint, rewrite only the case in question
                     if (_caseCorrdsForMonoPrint != null)
                     {
@@ -176,6 +184,9 @@ namespace MazeGenerator
             {
                 for (int y = yCorner; y < maxYCorner; y++)
                 {
+
+                    //Slow print if nedded
+                    Thread.Sleep(printTime);
 
                     if (x > 0 && y > 0)
                     {
@@ -389,15 +400,31 @@ namespace MazeGenerator
             #endregion
 
             #region Borders
-            //go thgough all the visible chars
+            //go thgough all the visible chars, or around a mono print case
             for (int x = 0; x < _maze.GetLength(0) * SIZE; x++)
             {
+                //if this is a monoPrint, check only the line in question
+                if (_caseCorrdsForMonoPrint != null && x == 0)
+                {
+                    x += _caseCorrdsForMonoPrint[0] * SIZE;
+                }
+
                 for (int y = 0; y < _maze.GetLength(1) * SIZE; y++)
                 {
+                    //if this is a monoPrint, check only the row in question
+                    if (_caseCorrdsForMonoPrint != null && y== 0)
+                    {
+                        y = _caseCorrdsForMonoPrint[1] * SIZE;
+                    }
+
                     //check what string need to be wroten
                     //left walls                   
                     if (x == 0 && y > 0 && y % 2 == 0)
                     {
+
+                        //Slow print if nedded
+                        Thread.Sleep(printTime);
+
                         Console.SetCursorPosition(x, y);
                         //check if there's a wall at right to write the correct char
 
@@ -414,6 +441,10 @@ namespace MazeGenerator
                     //right walls
                     else if (x == _maze.GetLength(0) * SIZE - 1 && y > 0 && y % 2 == 0)
                     {
+
+                        //Slow print if nedded
+                        Thread.Sleep(printTime);
+
                         Console.SetCursorPosition(x + 1, y);
                         //check if there's a wall at left to write the correct char
 
@@ -430,6 +461,10 @@ namespace MazeGenerator
                     //top walls
                     else if (y == 0 && x > 0 && x % 2 == 0)
                     {
+                        //Slow print if nedded
+                        Thread.Sleep(printTime);
+
+
                         Console.SetCursorPosition(x, y);
                         //check if there's a wall under to write the correct char
 
@@ -446,6 +481,10 @@ namespace MazeGenerator
                     //bottom walls
                     else if (y == _maze.GetLength(1) * SIZE - 1 && x > 0 && x % 2 == 0)
                     {
+
+
+                        //Slow print if nedded
+                        Thread.Sleep(printTime);
 
                         Console.SetCursorPosition(x, y + 1);
                         //check if there's a wall on top to write the correct char

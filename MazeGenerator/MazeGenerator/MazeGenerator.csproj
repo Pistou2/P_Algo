@@ -43,7 +43,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="local.cs" />
     <Compile Include="Maze.cs" />
     <Compile Include="MazeSolver.cs" />
     <Compile Include="Program.cs" />

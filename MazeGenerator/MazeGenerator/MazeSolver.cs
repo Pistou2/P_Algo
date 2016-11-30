@@ -9,6 +9,7 @@ namespace MazeGenerator
 {
     class MazeSolver
     {
+        const int SLEEP_TIME = 1;
         /// <summary>
         /// Résoud un labyrinthe
         /// </summary>
@@ -94,7 +95,7 @@ namespace MazeGenerator
             }
 
             Program.printMaze(currentX, currentY, ConsoleColor.Cyan);
-            Thread.Sleep(5);
+            Thread.Sleep(SLEEP_TIME);
 
             // Tant qu'il n'a pas regardé toutes les directions et qu'il n'a pas atteint la fin
             while (directions.Count != 0 && !isEnded)
@@ -122,13 +123,13 @@ namespace MazeGenerator
             {
                 solvedList.Add(new int[] { currentX, currentY });
                 Program.printMaze(currentX, currentY, ConsoleColor.Gray);
-                Thread.Sleep(5);
+                Thread.Sleep(SLEEP_TIME);
             }
 
             else
             {
                 Program.printMaze(currentX, currentY, ConsoleColor.DarkCyan);
-                Thread.Sleep(5);
+                Thread.Sleep(SLEEP_TIME);
             }
         }
 
@@ -175,7 +176,7 @@ namespace MazeGenerator
             }
 
             Program.printMaze(currentX, currentY, ConsoleColor.Red);
-            Thread.Sleep(5);
+            Thread.Sleep(SLEEP_TIME);
 
             // Tant qu'il n'a pas regardé toutes les directions et qu'il n'a pas atteint la fin
             while (directions.Count != 0 && !isEnded)
@@ -203,13 +204,13 @@ namespace MazeGenerator
             {
                 solvedList.Add(new int[] { currentX, currentY });
                 Program.printMaze(currentX, currentY, ConsoleColor.White);
-                Thread.Sleep(5);
+                Thread.Sleep(SLEEP_TIME);
             }
 
             else
             {
                 Program.printMaze(currentX, currentY, ConsoleColor.DarkRed);
-                Thread.Sleep(5);
+                Thread.Sleep(SLEEP_TIME);
             }
         }
 

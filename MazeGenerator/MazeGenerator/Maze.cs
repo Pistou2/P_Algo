@@ -111,7 +111,7 @@ namespace MazeGenerator
         private void GenerateMaze(int[,] mazeToGenerate, int? stepByStepLength = null)
         {
             // Génère le labyrinthe
-            GenerateMaze(0, 0, mazeToGenerate, stepByStepLength);
+            GenerateMaze(random.Next(width), random.Next(height), mazeToGenerate, stepByStepLength);
 
             // Choisi la position de l'entrée et de la sortie du labyrinthe
             int topDoorPos = random.Next(width);
