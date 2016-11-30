@@ -20,14 +20,12 @@ namespace MazeGenerator
 
         static void Main(string[] args)
         {
-            Console.SetWindowSize(208, 123);
 
-            Maze maze = new Maze(100, 100);
+            Maze maze = new Maze(100, 55, 1);
             Console.Clear();
 
             printMaze(maze.maze);
-
-            maze.SolveMaze();
+            
             Console.ReadLine();
         }
 
@@ -126,8 +124,25 @@ namespace MazeGenerator
                 xCorner = _caseCorrdsForMonoPrint[0];
                 yCorner = _caseCorrdsForMonoPrint[1];
 
-                maxXCorner = xCorner + 1;
-                maxYCorner = yCorner + 1;
+
+                if (_maze.GetLength(0) - 1 == xCorner)
+                {
+                    maxXCorner = xCorner + 1;
+                }
+                else
+                {
+                    maxXCorner = xCorner + 2;
+                }
+
+                if (_maze.GetLength(1) - 1 == yCorner)
+                {
+                    maxYCorner = yCorner + 1;
+                }
+                else
+                {
+                    maxYCorner = yCorner + 2;
+                }
+
             }
             else
             {
@@ -140,23 +155,23 @@ namespace MazeGenerator
 
 
             //go through all the cases
-            for (xCorner; xCorner < maxXCorner; xCorner++)
+            for (int x = xCorner; x < maxXCorner; x++)
             {
-                for (yCorner = 0; yCorner < maxYCorner; yCorner++)
+                for (int y = yCorner; y < maxYCorner; y++)
                 {
 
-                    if (xCorner > 0 && yCorner > 0)
+                    if (x > 0 && y > 0)
                     {
 
                         //TODO
-                        Console.SetCursorPosition(xCorner * SIZE, yCorner * SIZE);
+                        Console.SetCursorPosition(x * SIZE, y * SIZE);
 
 
                         //set the temp bool (Top, bottom, right, left)
-                        tempCornerWalls[0] = ((_maze[xCorner, yCorner - 1] & 8) == 0);
-                        tempCornerWalls[1] = ((_maze[xCorner, yCorner] & 8) == 0);
-                        tempCornerWalls[2] = ((_maze[xCorner, yCorner] & 1) == 0);
-                        tempCornerWalls[3] = ((_maze[xCorner - 1, yCorner] & 1) == 0);
+                        tempCornerWalls[0] = ((_maze[x, y - 1] & 8) == 0);
+                        tempCornerWalls[1] = ((_maze[x, y] & 8) == 0);
+                        tempCornerWalls[2] = ((_maze[x, y] & 1) == 0);
+                        tempCornerWalls[3] = ((_maze[x - 1, y] & 1) == 0);
 
                         #region Char test
 
