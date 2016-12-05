@@ -19,8 +19,8 @@ namespace MazeGenerator
         /// </summary>
         private int height;
 
-        private int[] enterDoorPos;
-        private int[] outDoorPos;
+        public int[] enterDoorPos;
+        public int[] outDoorPos;
 
         // Constante pour stocker les noms des différentes directions
         public const string TOP = "top";

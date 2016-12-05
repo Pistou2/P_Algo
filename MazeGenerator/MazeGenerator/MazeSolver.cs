@@ -13,22 +13,8 @@ namespace MazeGenerator
         /// </summary>
         /// <param name="mazeToSolve">Labyrinthe à résoudre</param>
         /// <returns>List des positions des cases où il faut passer pour résoudre le labyrinthe</returns>
-        public static List<int[]> SolveMaze(int[,] mazeToSolve, int printTime = 0)
+        public static List<int[]> SolveMaze(Maze mazeToSolve, int printTime = 0)
         {
-            // Initialise une variable pour avoir la case où il y a l'entrée
-            int firstPositionX = -1;
-
-            // Regarde chaque case du haut jusqu'à ce qu'il trouve l'entrée
-            for (int i = 0; i < mazeToSolve.GetLength(0) && firstPositionX == -1; i++)
-            {
-                // Regarde si c'est la case avec l'entrée
-                if ((mazeToSolve[i, 0] & Maze.TBRL[Maze.TOP]) == Maze.TBRL[Maze.TOP])
-                {
-                    // Enregistre la position de l'entrée
-                    firstPositionX = i;
-                }
-            }
-
             // Crée une liste où sera stocker les cases de la solution
             List<int[]> solvedMaze = new List<int[]>();
 
@@ -37,9 +23,9 @@ namespace MazeGenerator
             bool isEndedLeft = false;
 
             // Résoud le labyrinthe
-            Thread thRight = new Thread(x => SolveMazeRight(mazeToSolve, Maze.BOTTOM, firstPositionX, 0, solvedMaze, ref isEndedRight, printTime));
+            Thread thRight = new Thread(x => SolveMazeRight(mazeToSolve.maze, Maze.BOTTOM, mazeToSolve.enterDoorPos[0], mazeToSolve.enterDoorPos[1], solvedMaze, ref isEndedRight, printTime));
 
-            Thread thLeft = new Thread(x => SolveMazeLeft(mazeToSolve, Maze.BOTTOM, firstPositionX, 0, solvedMaze, ref isEndedLeft, printTime));
+            Thread thLeft = new Thread(x => SolveMazeLeft(mazeToSolve.maze, Maze.BOTTOM, mazeToSolve.enterDoorPos[0], mazeToSolve.enterDoorPos[1], solvedMaze, ref isEndedLeft, printTime));
 
             thRight.Start();
             thLeft.Start();

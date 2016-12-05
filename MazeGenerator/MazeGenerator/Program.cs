@@ -59,7 +59,7 @@ namespace MazeGenerator
 
                 printMaze(maze.maze, null);
 
-                MazeSolver.SolveMaze(maze.maze);
+                MazeSolver.SolveMaze(maze);
 
                 //Thread.Sleep(5000);
 
