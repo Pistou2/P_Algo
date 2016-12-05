@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace MazeGenerator
 {
-    class Maze
+    partial class Maze
     {
         /// <summary>
         /// Largeur du labyrinthe
@@ -101,7 +101,7 @@ namespace MazeGenerator
             //L'affiche une première fois pour un step by step
             if (stepByStepLength != null)
             {
-                Program.printMaze(maze);
+                PrintMaze(maze);
             }
             GenerateMaze(maze, stepByStepLength);
         }
@@ -164,7 +164,7 @@ namespace MazeGenerator
                     if (stepByStepLength != null)
                     {
                         //écrit la case
-                        Program.printMaze(mazeToGenerate, new int[] { currentX, currentY });
+                        PrintMaze(mazeToGenerate, new int[] { currentX, currentY });
                         System.Threading.Thread.Sleep((int)stepByStepLength);
                     }
 
@@ -236,6 +236,56 @@ namespace MazeGenerator
             }
 
             return true;
+        }
+
+        public static void PrintMaze(int[,] _maze, int[] _caseCorrdsForMonoPrint = null, int printTime = 0)
+        {
+            //check if this is a monoPrint (only generate 1 case)
+            if (_caseCorrdsForMonoPrint != null)
+            {
+                //clear the case
+                for (int x = 0; x <= SIZE; x++)
+                {
+                    for (int y = 0; y <= SIZE; y++)
+                    {
+                        Console.SetCursorPosition(_caseCorrdsForMonoPrint[0] * SIZE + x, _caseCorrdsForMonoPrint[1] * SIZE + y);
+                        Console.Write(" ");
+                        //Slow print if nedded
+                    }
+                }
+
+                ShowCase(_maze, _caseCorrdsForMonoPrint[0], _caseCorrdsForMonoPrint[1]);
+
+                if (_caseCorrdsForMonoPrint[0] < _maze.GetLength(0) - 1 && _caseCorrdsForMonoPrint[1] < _maze.GetLength(1) - 1)
+                {
+                    ShowCase(_maze, _caseCorrdsForMonoPrint[0] + 1, _caseCorrdsForMonoPrint[1] + 1);
+                }
+
+                if (_caseCorrdsForMonoPrint[0] < _maze.GetLength(0) - 1)
+                {
+                    ShowCase(_maze, _caseCorrdsForMonoPrint[0] + 1, _caseCorrdsForMonoPrint[1]);
+                }
+
+                if (_caseCorrdsForMonoPrint[1] < _maze.GetLength(1) - 1)
+                {
+                    ShowCase(_maze, _caseCorrdsForMonoPrint[0], _caseCorrdsForMonoPrint[1] + 1);
+                }
+
+                Thread.Sleep(printTime);
+            }
+
+            else
+            {
+                //go through all the cases
+                for (int x = 0; x < _maze.GetLength(0); x++)
+                {
+                    for (int y = 0; y < _maze.GetLength(1); y++)
+                    {
+                        ShowCase(_maze, x, y);
+                        Thread.Sleep(printTime);
+                    }
+                }
+            }
         }
     }
 }

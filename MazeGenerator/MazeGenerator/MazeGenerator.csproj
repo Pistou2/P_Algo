@@ -65,6 +65,7 @@
   <ItemGroup>
     <Compile Include="Maze.cs" />
     <Compile Include="MazeSolver.cs" />
+    <Compile Include="PrintMaze.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
