@@ -43,10 +43,8 @@ namespace MazeGenerator
         static void Main(string[] args)
         {
             Console.ReadLine();
-            Console.SetWindowSize(208, 123);
-            int number = Convert.ToInt32(Console.ReadLine());
-
-            for (int i = 0; i < number; i++)
+            Console.SetWindowSize(200, 123);
+            while (true)
             {
                 /*Console.Write("Largeur: ");
                 int width = Convert.ToInt32(Console.ReadLine());
@@ -59,7 +57,7 @@ namespace MazeGenerator
 
                 Console.Clear();
 
-                printMaze(maze.maze, null);
+                printMaze(maze.maze, null, 5);
 
                 MazeSolver.SolveMaze(maze.maze);
 
@@ -234,12 +232,22 @@ namespace MazeGenerator
         /// <summary>
         /// Debug Method
         /// </summary>
-        public static void printMaze(/*int[,] _maze,*/ int _lastX, int _lastY, ConsoleColor color)
+        public static void printStep(int _x, int _y, int _lastX, int _lastY, ConsoleColor color)
         {
             mut.WaitOne();
-            //printMaze(_maze);
-            Console.SetCursorPosition(_lastX * SIZE + 1, _lastY * SIZE + 1);
+
             Console.BackgroundColor = color;
+            //write the step
+            Console.SetCursorPosition(_x * SIZE + 1, _y * SIZE + 1);
+            Console.Write(" ");
+
+            //Write the middle step
+            _x = _x * SIZE + 1;
+            _y = _y * SIZE + 1;
+
+
+
+            Console.SetCursorPosition(_x + _lastX, _y + _lastY);
             Console.Write(" ");
             Console.BackgroundColor = ConsoleColor.Black;
             mut.ReleaseMutex();
