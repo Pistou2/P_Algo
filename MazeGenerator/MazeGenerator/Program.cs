@@ -13,6 +13,25 @@ namespace MazeGenerator
     {
         public/*const x.x*/ static string[] WALL_STRINGS = new string[] { "─", "│", "├", "┤", "┬", "┴", "┌", "┐", "└", "┘", "┼" };
 
+        public static Dictionary<int, string> WALL = new Dictionary<int, string>()
+        {
+            { 14,"─" },
+            { 13,"─" },
+            { 12,"─" },
+            { 11,"│" },
+            { 10,"└" },
+            { 9, "┘" },
+            { 8, "┴" },
+            { 7, "│" },
+            { 6, "┌" },
+            { 5, "┐" },
+            { 4, "┬" },
+            { 3, "│" },
+            { 2, "├" },
+            { 1, "┤" },
+            { 0, "┼" }
+        };
+
         /// <summary>
         /// const used to display the maze, minimum value = 2
         /// </summary>
@@ -25,7 +44,9 @@ namespace MazeGenerator
         {
             Console.ReadLine();
             Console.SetWindowSize(208, 123);
-            while (true)
+            int number = Convert.ToInt32(Console.ReadLine());
+
+            for (int i = 0; i < number; i++)
             {
                 /*Console.Write("Largeur: ");
                 int width = Convert.ToInt32(Console.ReadLine());
@@ -34,17 +55,19 @@ namespace MazeGenerator
                 int height = Convert.ToInt32(Console.ReadLine());*/
                 Console.Clear();
 
-                Maze maze = new Maze(/*width*/10, /*height*/10);
+                Maze maze = new Maze(/*width*/50, /*height*/50, 10);
 
                 Console.Clear();
 
-                printMaze(maze.maze, null);                
+                printMaze(maze.maze, null);
 
                 MazeSolver.SolveMaze(maze.maze);
 
+                //Thread.Sleep(5000);
+
                 //MazeSolver.ShowSolution(MazeSolver.SolveMaze(maze.maze));
 
-                //Console.ReadLine();
+                Console.ReadLine();
             }
             Console.ReadLine();
         }
@@ -62,445 +85,150 @@ namespace MazeGenerator
                         Console.SetCursorPosition(_caseCorrdsForMonoPrint[0] * SIZE + x, _caseCorrdsForMonoPrint[1] * SIZE + y);
                         Console.Write(" ");
                         //Slow print if nedded
-                        Thread.Sleep(printTime);
                     }
                 }
 
+                ShowCase(_maze, _caseCorrdsForMonoPrint[0], _caseCorrdsForMonoPrint[1]);
+
+                if (_caseCorrdsForMonoPrint[0] < _maze.GetLength(0) - 1 && _caseCorrdsForMonoPrint[1] < _maze.GetLength(1) - 1)
+                {
+                    ShowCase(_maze, _caseCorrdsForMonoPrint[0] + 1, _caseCorrdsForMonoPrint[1] + 1);
+                }
+
+                if (_caseCorrdsForMonoPrint[0] < _maze.GetLength(0) - 1)
+                {
+                    ShowCase(_maze, _caseCorrdsForMonoPrint[0] + 1, _caseCorrdsForMonoPrint[1]);
+                }
+
+                if (_caseCorrdsForMonoPrint[1] < _maze.GetLength(1) - 1)
+                {
+                    ShowCase(_maze, _caseCorrdsForMonoPrint[0], _caseCorrdsForMonoPrint[1] + 1);
+                }
+
+                Thread.Sleep(printTime);
             }
 
-            #region cases
-
-            bool[] tempCornerWalls = new bool[4];
-            string tempCornerText;
-            //go through all the cases
-            for (int x = 0; x < _maze.GetLength(0); x++)
-            {
-                for (int y = 0; y < _maze.GetLength(1); y++)
-                {
-                    //Slow print if nedded
-                    Thread.Sleep(printTime);
-
-                    //if this is a monoPrint, rewrite only the case in question
-                    if (_caseCorrdsForMonoPrint != null)
-                    {
-                        x = _caseCorrdsForMonoPrint[0];
-                        y = _caseCorrdsForMonoPrint[1];
-                    }
-
-                    //if the first bit is lit
-                    if ((_maze[x, y] & 1) == 0)
-                    {
-                        //write the top wall
-                        Console.SetCursorPosition(x * SIZE + 1, y * SIZE);
-                        Console.Write(WALL_STRINGS[0]);
-                    }
-
-                    //if the forth bit is lit
-                    if ((_maze[x, y] & 8) == 0)
-                    {
-                        //write the left wall
-                        Console.SetCursorPosition(x * SIZE, y * SIZE + 1);
-                        Console.Write(WALL_STRINGS[1]);
-                    }
-
-                    //if this is the last case of the row, or a monoPrint
-                    if (y == _maze.GetLength(1) - 1 | _caseCorrdsForMonoPrint != null)
-                    {
-                        //sets the bottom wall if needed
-                        //if the second bit is lit
-                        if ((_maze[x, y] & 2) == 0)
-                        {
-                            //write the bottom wall
-                            Console.SetCursorPosition(x * SIZE + 1, y * SIZE + 2);
-                            Console.Write(WALL_STRINGS[0]);
-                        }
-                    }
-
-                    //if this is the last row, or a monoPrint
-                    if (x == _maze.GetLength(0) - 1 | _caseCorrdsForMonoPrint != null)
-                    {
-                        //sets the right wall if needed
-
-                        //if the third bit is lit
-                        if ((_maze[x, y] & 4) == 0)
-                        {
-                            //write the right wall
-                            Console.SetCursorPosition(x * SIZE + 2, y * SIZE + 1);
-                            Console.Write(WALL_STRINGS[1]);
-                        }
-                    }
-
-                    //get out of the fors directly if this is a monoPrint
-                    if (_caseCorrdsForMonoPrint != null)
-                    {
-                        x = _maze.GetLength(0);
-                        y = _maze.GetLength(1);
-                    }
-
-                }
-            }
-            #endregion
-
-            #region Case Corners
-            int xCorner, yCorner, maxXCorner, maxYCorner;
-            //if this is a monoPrint, only handle the corners around the changed case
-            if (_caseCorrdsForMonoPrint != null)
-            {
-                xCorner = _caseCorrdsForMonoPrint[0];
-                yCorner = _caseCorrdsForMonoPrint[1];
-
-
-                if (_maze.GetLength(0) - 1 == xCorner)
-                {
-                    maxXCorner = xCorner + 1;
-                }
-                else
-                {
-                    maxXCorner = xCorner + 2;
-                }
-
-                if (_maze.GetLength(1) - 1 == yCorner)
-                {
-                    maxYCorner = yCorner + 1;
-                }
-                else
-                {
-                    maxYCorner = yCorner + 2;
-                }
-
-            }
             else
             {
-                xCorner = 0;
-                yCorner = 0;
-
-                maxXCorner = _maze.GetLength(0);
-                maxYCorner = _maze.GetLength(1);
+                //go through all the cases
+                for (int x = 0; x < _maze.GetLength(0); x++)
+                {
+                    for (int y = 0; y < _maze.GetLength(1); y++)
+                    {
+                        ShowCase(_maze, x, y);
+                    }
+                }
             }
+        }
 
+        private static void ShowCase (int[,] _maze, int posX, int posY)
+        {
+            int tmp;
 
-            //go through all the cases
-            for (int x = xCorner; x < maxXCorner; x++)
+            //if the first bit is lit
+            if ((_maze[posX, posY] & 1) == 0)
             {
-                for (int y = yCorner; y < maxYCorner; y++)
-                {
-
-                    //Slow print if nedded
-                    Thread.Sleep(printTime);
-
-                    if (x > 0 && y > 0)
-                    {
-
-                        //TODO
-                        Console.SetCursorPosition(x * SIZE, y * SIZE);
-
-
-                        //set the temp bool (Top, bottom, right, left)
-                        tempCornerWalls[0] = ((_maze[x, y - 1] & 8) == 0);
-                        tempCornerWalls[1] = ((_maze[x, y] & 8) == 0);
-                        tempCornerWalls[2] = ((_maze[x, y] & 1) == 0);
-                        tempCornerWalls[3] = ((_maze[x - 1, y] & 1) == 0);
-
-                        #region Char test
-
-                        if (tempCornerWalls[0])
-                        #region Top + ?
-                        {
-                            if (tempCornerWalls[1])
-                            #region Top + Bottom + ?
-                            {
-                                if (tempCornerWalls[2])
-                                #region Top + Bottom + Right + ?
-                                {
-                                    if (tempCornerWalls[3])
-                                    #region Top + Bottom + Right + Left
-                                    {
-                                        tempCornerText = WALL_STRINGS[10];
-                                    }
-                                    #endregion
-                                    else
-                                    #region Top + Bottom + Right
-                                    {
-                                        tempCornerText = WALL_STRINGS[2];
-                                    }
-                                    #endregion
-
-                                }
-                                #endregion
-                                else
-                                #region Top + Bottom + ?
-                                {
-                                    if (tempCornerWalls[3])
-                                    #region Top + Bottom + Left
-                                    {
-                                        tempCornerText = WALL_STRINGS[3];
-                                    }
-                                    #endregion
-                                    else
-                                    #region Top + Bottom
-                                    {
-                                        tempCornerText = WALL_STRINGS[1];
-                                    }
-                                    #endregion
-                                }
-                                #endregion
-                            }
-                            #endregion
-                            else
-                            #region Top + ?
-                            {
-                                if (tempCornerWalls[2])
-                                #region Top + Right + ?
-                                {
-                                    if (tempCornerWalls[3])
-                                    #region Top + Right + Left
-                                    {
-                                        tempCornerText = WALL_STRINGS[5];
-                                    }
-                                    #endregion
-                                    else
-                                    #region Top + Right
-                                    {
-                                        tempCornerText = WALL_STRINGS[8];
-                                    }
-                                    #endregion
-
-                                }
-                                #endregion
-                                else
-                                #region Top + ?
-                                {
-                                    if (tempCornerWalls[3])
-                                    #region Top + Left
-                                    {
-                                        tempCornerText = WALL_STRINGS[9];
-                                    }
-                                    #endregion
-                                    else
-                                    #region Top
-                                    {
-                                        tempCornerText = WALL_STRINGS[1];
-                                    }
-                                    #endregion
-                                }
-                                #endregion
-                            }
-                            #endregion
-                        }
-                        #endregion
-                        else
-                        #region + ?
-                        {
-                            if (tempCornerWalls[1])
-                            #region Bottom + ?
-                            {
-                                if (tempCornerWalls[2])
-                                #region Bottom + Right + ?
-                                {
-                                    if (tempCornerWalls[3])
-                                    #region Bottom + Right + Left
-                                    {
-                                        tempCornerText = WALL_STRINGS[4];
-                                    }
-                                    #endregion
-                                    else
-                                    #region Bottom + Right
-                                    {
-                                        tempCornerText = WALL_STRINGS[6];
-                                    }
-                                    #endregion
-
-                                }
-                                #endregion
-                                else
-                                #region Bottom + ?
-                                {
-                                    if (tempCornerWalls[3])
-                                    #region Bottom + Left
-                                    {
-                                        tempCornerText = WALL_STRINGS[7];
-                                    }
-                                    #endregion
-                                    else
-                                    #region Bottom
-                                    {
-                                        tempCornerText = WALL_STRINGS[1];
-                                    }
-                                    #endregion
-                                }
-                                #endregion
-                            }
-                            #endregion
-                            else
-                            #region + ?
-                            {
-                                if (tempCornerWalls[2])
-                                #region Right + ?
-                                {
-                                    if (tempCornerWalls[3])
-                                    #region Right + Left
-                                    {
-                                        tempCornerText = WALL_STRINGS[0];
-                                    }
-                                    #endregion
-                                    else
-                                    #region Right
-                                    {
-                                        tempCornerText = WALL_STRINGS[0];
-                                    }
-                                    #endregion
-
-                                }
-                                #endregion
-                                else
-                                #region + ?
-                                {
-                                    if (tempCornerWalls[3])
-                                    #region Left
-                                    {
-                                        tempCornerText = WALL_STRINGS[0];
-                                    }
-                                    #endregion
-                                    else
-                                    #region NOTHING ?!?!?!??
-                                    {
-                                        Debug.Fail("LE labyrinthe n'est pas parfait ._.");
-                                        tempCornerText = "";
-                                    }
-                                    #endregion
-                                }
-                                #endregion
-                            }
-                            #endregion
-                        }
-                        #endregion
-                        #endregion
-
-                        Console.Write(tempCornerText);
-                    }
-
-                }
+                //write the top wall
+                Console.SetCursorPosition(posX * SIZE + 1, posY * SIZE);
+                Console.Write(WALL[12]);
             }
-            #endregion
 
-            #region Tab Corners
-            //write all the corners
-            Console.SetCursorPosition(0, 0);
-            Console.Write(WALL_STRINGS[6]);
-
-            Console.SetCursorPosition(_maze.GetLength(0) * SIZE, 0);
-            Console.Write(WALL_STRINGS[7]);
-
-            Console.SetCursorPosition(0, _maze.GetLength(1) * SIZE);
-            Console.Write(WALL_STRINGS[8]);
-
-            Console.SetCursorPosition(_maze.GetLength(0) * SIZE, _maze.GetLength(1) * SIZE);
-            Console.Write(WALL_STRINGS[9]);
-
-            #endregion
-
-            #region Borders
-            //go thgough all the visible chars, or around a mono print case
-            for (int x = 0; x < _maze.GetLength(0) * SIZE; x++)
+            //if the forth bit is lit
+            if ((_maze[posX, posY] & 8) == 0)
             {
-                //if this is a monoPrint, check only the line in question
-                if (_caseCorrdsForMonoPrint != null && x == 0)
+                //write the left wall
+                Console.SetCursorPosition(posX * SIZE, posY * SIZE + 1);
+                Console.Write(WALL[3]);
+            }
+
+            Console.SetCursorPosition(posX * SIZE, posY * SIZE);
+
+            if (posX > 0 && posY > 0)
+            {
+                tmp = (_maze[posX, posY] & 9) + (_maze[posX - 1, posY - 1] & 6);
+
+                Console.Write(WALL[tmp]);
+            }
+
+            else if (posX == 0 && posY == 0)
+            {
+                Console.Write(WALL[6]);
+            }
+
+            else if (posX == 0)
+            {
+                tmp = (_maze[posX, posY] & 9) + (_maze[posX, posY - 1] & 8) / 2 + 2;
+
+                Console.Write(WALL[tmp]);
+            }
+
+            else if (posY == 0)
+            {
+                tmp = (_maze[posX, posY] & 9) + (_maze[posX - 1, posY] & 1) * 2 + 4;
+
+                Console.Write(WALL[tmp]);
+            }
+
+
+            //if this is the last case of the row
+            if (posY == _maze.GetLength(1) - 1)
+            {
+                //sets the bottom wall if needed
+                //if the second bit is lit
+                if ((_maze[posX, posY] & 2) == 0)
                 {
-                    x += _caseCorrdsForMonoPrint[0] * SIZE;
+                    //write the bottom wall
+                    Console.SetCursorPosition(posX * SIZE + 1, posY * SIZE + 2);
+                    Console.Write(WALL[12]);
                 }
 
-                for (int y = 0; y < _maze.GetLength(1) * SIZE; y++)
+                Console.SetCursorPosition(posX * SIZE, posY * SIZE + 2);
+
+                if (posX == 0)
                 {
-                    //if this is a monoPrint, check only the row in question
-                    if (_caseCorrdsForMonoPrint != null && y== 0)
-                    {
-                        y = _caseCorrdsForMonoPrint[1] * SIZE;
-                    }
+                    Console.Write(WALL[10]);
+                }
 
-                    //check what string need to be wroten
-                    //left walls                   
-                    if (x == 0 && y > 0 && y % 2 == 0)
-                    {
+                else
+                {
+                    tmp = (_maze[posX, posY] & 2) / 2 + (_maze[posX - 1, posY] & 6) + 8;
 
-                        //Slow print if nedded
-                        Thread.Sleep(printTime);
-
-                        Console.SetCursorPosition(x, y);
-                        //check if there's a wall at right to write the correct char
-
-                        if ((_maze[x / SIZE, y / SIZE - 1] & 2) == 0)
-                        {
-                            Console.Write(WALL_STRINGS[2]);
-                        }
-                        else
-                        {
-                            Console.Write(WALL_STRINGS[1]);
-                        }
-                    }
-
-                    //right walls
-                    else if (x == _maze.GetLength(0) * SIZE - 1 && y > 0 && y % 2 == 0)
-                    {
-
-                        //Slow print if nedded
-                        Thread.Sleep(printTime);
-
-                        Console.SetCursorPosition(x + 1, y);
-                        //check if there's a wall at left to write the correct char
-
-                        if ((_maze[x / SIZE, y / SIZE - 1] & 2) == 0)
-                        {
-                            Console.Write(WALL_STRINGS[3]);
-                        }
-                        else
-                        {
-                            Console.Write(WALL_STRINGS[1]);
-                        }
-                    }
-
-                    //top walls
-                    else if (y == 0 && x > 0 && x % 2 == 0)
-                    {
-                        //Slow print if nedded
-                        Thread.Sleep(printTime);
-
-
-                        Console.SetCursorPosition(x, y);
-                        //check if there's a wall under to write the correct char
-
-                        if ((_maze[x / SIZE, y / SIZE] & 8) == 0)
-                        {
-                            Console.Write(WALL_STRINGS[4]);
-                        }
-                        else
-                        {
-                            Console.Write(WALL_STRINGS[0]);
-                        }
-                    }
-
-                    //bottom walls
-                    else if (y == _maze.GetLength(1) * SIZE - 1 && x > 0 && x % 2 == 0)
-                    {
-
-
-                        //Slow print if nedded
-                        Thread.Sleep(printTime);
-
-                        Console.SetCursorPosition(x, y + 1);
-                        //check if there's a wall on top to write the correct char
-
-                        if ((_maze[x / SIZE, y / SIZE] & 8) == 0)
-                        {
-                            Console.Write(WALL_STRINGS[5]);
-                        }
-                        else
-                        {
-                            Console.Write(WALL_STRINGS[0]);
-                        }
-                    }
+                    Console.Write(WALL[tmp]);
                 }
             }
-            #endregion
+
+            //if this is the last row
+            if (posX == _maze.GetLength(0) - 1)
+            {
+                //sets the right wall if needed
+
+                //if the third bit is lit
+                if ((_maze[posX, posY] & 4) == 0)
+                {
+                    //write the right wall
+                    Console.SetCursorPosition(posX * SIZE + 2, posY * SIZE + 1);
+                    Console.Write(WALL[3]);
+                }
+
+                Console.SetCursorPosition(posX * SIZE + 2, posY * SIZE);
+
+                if (posY == 0)
+                {
+                    Console.Write(WALL[5]);
+                }
+
+                else
+                {
+                    tmp = (_maze[posX, posY] & 4) * 2 + (_maze[posX, posY - 1] & 6) + 1;
+                    Console.Write(WALL[tmp]);
+                }
+
+                if (posY == _maze.GetLength(1) - 1)
+                {
+                    Console.SetCursorPosition(posX * SIZE + 2, posY * SIZE + 2);
+                    Console.Write(WALL[9]);
+                }
+            }
         }
 
         /// <summary>

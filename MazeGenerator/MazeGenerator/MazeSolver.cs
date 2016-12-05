@@ -9,7 +9,12 @@ namespace MazeGenerator
 {
     class MazeSolver
     {
-        const int SLEEP_TIME = 1;
+        const int SLEEP_TIME = 0;
+
+        static int left = 0;
+        static int right = 0;
+        static int white = 0;
+
         /// <summary>
         /// Résoud un labyrinthe
         /// </summary>
@@ -39,15 +44,16 @@ namespace MazeGenerator
             bool isEndedLeft = false;
 
             // Résoud le labyrinthe
-            Thread thRight = new Thread(x=>SolveMazeRight(mazeToSolve, Maze.BOTTOM, firstPositionX, 0, solvedMaze, ref isEndedRight));
+            Thread thRight = new Thread(x=>SolveMazeRight(mazeToSolve, Maze.BOTTOM, firstPositionX, 0, solvedMaze, ref isEndedRight, ref right));
 
-            Thread thLeft = new Thread(x=>SolveMazeLeft(mazeToSolve, Maze.BOTTOM, firstPositionX, 0, solvedMaze, ref isEndedLeft));
+            Thread thLeft = new Thread(x=>SolveMazeLeft(mazeToSolve, Maze.BOTTOM, firstPositionX, 0, solvedMaze, ref isEndedLeft, ref left));
 
             thRight.Start();
             thLeft.Start();
 
 
-            while (thRight.IsAlive || thLeft.IsAlive || !isEndedRight || !isEndedLeft) { }
+            while (thRight.IsAlive || thLeft.IsAlive) { }
+
             // Retourne la liste
             return solvedMaze;
         }
@@ -61,8 +67,10 @@ namespace MazeGenerator
         /// <param name="currentY">La position verticale de la case actuel</param>
         /// <param name="solvedList">List avec les positions de solution</param>
         /// <param name="isEnded">Si on est arrivé à la fin du labyrinthe</param>
-        private static void SolveMazeRight(int[,] mazeToSolve, string lastDirection, int currentX, int currentY, List<int[]> solvedList, ref bool isEnded)
+        private static void SolveMazeRight(int[,] mazeToSolve, string lastDirection, int currentX, int currentY, List<int[]> solvedList, ref bool isEnded, ref int count)
         {
+            count++;
+
             // Crée une liste qui contiendra les directions dans l'ordre où il faut regardé
             List<string> directions = new List<string>();
             
@@ -107,7 +115,7 @@ namespace MazeGenerator
 
                     if (nextX >= 0 && nextX < mazeToSolve.GetLength(0) && nextY >= 0 && nextY < mazeToSolve.GetLength(1))
                     {
-                        SolveMazeRight(mazeToSolve, directions[0], nextX, nextY, solvedList, ref isEnded);
+                        SolveMazeRight(mazeToSolve, directions[0], nextX, nextY, solvedList, ref isEnded, ref count);
                     }
 
                     else
@@ -122,8 +130,10 @@ namespace MazeGenerator
             if (isEnded)
             {
                 solvedList.Add(new int[] { currentX, currentY });
-                Program.printMaze(currentX, currentY, ConsoleColor.Gray);
+                Program.printMaze(currentX, currentY, ConsoleColor.White);
                 Thread.Sleep(SLEEP_TIME);
+                count--;
+                white++;
             }
 
             else
@@ -142,8 +152,10 @@ namespace MazeGenerator
         /// <param name="currentY">La position verticale de la case actuel</param>
         /// <param name="solvedList">List avec les positions de solution</param>
         /// <param name="isEnded">Si on est arrivé à la fin du labyrinthe</param>
-        private static void SolveMazeLeft(int[,] mazeToSolve, string lastDirection, int currentX, int currentY, List<int[]> solvedList, ref bool isEnded)
+        private static void SolveMazeLeft(int[,] mazeToSolve, string lastDirection, int currentX, int currentY, List<int[]> solvedList, ref bool isEnded, ref int count)
         {
+            count++;
+
             // Crée une liste qui contiendra les directions dans l'ordre où il faut regardé
             List<string> directions = new List<string>();
 
@@ -188,7 +200,7 @@ namespace MazeGenerator
 
                     if (nextX >= 0 && nextX < mazeToSolve.GetLength(0) && nextY >= 0 && nextY < mazeToSolve.GetLength(1))
                     {
-                        SolveMazeLeft(mazeToSolve, directions[0], nextX, nextY, solvedList, ref isEnded);
+                        SolveMazeLeft(mazeToSolve, directions[0], nextX, nextY, solvedList, ref isEnded, ref count);
                     }
 
                     else
@@ -205,6 +217,7 @@ namespace MazeGenerator
                 solvedList.Add(new int[] { currentX, currentY });
                 Program.printMaze(currentX, currentY, ConsoleColor.White);
                 Thread.Sleep(SLEEP_TIME);
+                count--;
             }
 
             else
