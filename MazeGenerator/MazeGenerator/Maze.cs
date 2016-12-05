@@ -133,9 +133,9 @@ namespace MazeGenerator
                 //divide the maze in 4 little mazes
                 Maze[] subMazes = new Maze[4];
 
-                subMazes[0] = new Maze(width / 2, height / 2, GenerationType.GenerateMazeByKruskal, stepByStepLength, false);
-                subMazes[1] = new Maze(width / 2, height / 2, GenerationType.RecursiveBacktracking, stepByStepLength, false);
-                subMazes[2] = new Maze(width / 2, height / 2, GenerationType.GenerateMazeByKruskal, stepByStepLength, false);
+                subMazes[0] = new Maze(Convert.ToInt32(Math.Ceiling((double)width / 2)), Convert.ToInt32(Math.Ceiling((double)height / 2)), GenerationType.GenerateMazeByKruskal, stepByStepLength, false);
+                subMazes[1] = new Maze(width / 2, Convert.ToInt32(Math.Ceiling((double)height / 2)), GenerationType.GenerateMazeByKruskal, stepByStepLength, false);
+                subMazes[2] = new Maze(Convert.ToInt32(Math.Ceiling((double)width / 2)), height / 2, GenerationType.RecursiveBacktracking, stepByStepLength, false);
                 subMazes[3] = new Maze(width / 2, height / 2, GenerationType.RecursiveBacktracking, stepByStepLength, false);
 
                 Console.Clear();
@@ -148,10 +148,12 @@ namespace MazeGenerator
                     {
                         for (int y = 0; y < subMazes[i].maze.GetLength(1); y++)
                         {
-                            maze[x + ((i % 2) * width / 2), y + (i / 2) * height / 2] = subMazes[i].maze[x, y];
+                            maze[x + ((i % 2) * Convert.ToInt32(Math.Ceiling((double)width / 2))), y + (i / 2) * Convert.ToInt32(Math.Ceiling((double)height / 2))] = subMazes[i].maze[x, y];
                         }
                     }
                 }
+
+                //Create 3 random doors between the sections
             }
 
             if (withDoors)

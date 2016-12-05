@@ -30,7 +30,7 @@ namespace MazeGenerator
                 int height = Convert.ToInt32(Console.ReadLine());*/
                 Console.Clear();
 
-                Maze maze = new Maze(/*width*/50, /*height*/50, Maze.GenerationType.Mixt, 2);
+                Maze maze = new Maze(/*width*/49, /*height*/49, Maze.GenerationType.Mixt, 2);
 
                 Console.Clear();
 
@@ -39,9 +39,7 @@ namespace MazeGenerator
                 //Maze.SolveMaze(maze);
 
                 //Thread.Sleep(5000);
-
-                Maze.ShowSolution(Maze.SolveMaze(maze));
-
+                
                 Console.ReadLine();
             }
         }
