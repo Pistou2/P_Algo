@@ -62,8 +62,6 @@ namespace MazeGenerator
         /// <param name="isEnded">Si on est arrivé à la fin du labyrinthe</param>
         private static void SolveMazeRight(int[,] mazeToSolve, string lastDirection, int currentX, int currentY, List<int[]> solvedList, ref bool isEnded, int printTime)
         {
-            count++;
-
             // Crée une liste qui contiendra les directions dans l'ordre où il faut regardé
             List<string> directions = new List<string>();
 
@@ -153,8 +151,6 @@ namespace MazeGenerator
         /// <param name="isEnded">Si on est arrivé à la fin du labyrinthe</param>
         private static void SolveMazeLeft(int[,] mazeToSolve, string lastDirection, int currentX, int currentY, List<int[]> solvedList, ref bool isEnded, int printTime)
         {
-            count++;
-
             // Crée une liste qui contiendra les directions dans l'ordre où il faut regardé
             List<string> directions = new List<string>();
 
