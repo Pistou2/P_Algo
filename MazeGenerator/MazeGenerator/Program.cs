@@ -114,6 +114,7 @@ namespace MazeGenerator
                     for (int y = 0; y < _maze.GetLength(1); y++)
                     {
                         ShowCase(_maze, x, y);
+                        Thread.Sleep(printTime);
                     }
                 }
             }
