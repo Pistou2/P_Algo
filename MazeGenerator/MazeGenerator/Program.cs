@@ -53,11 +53,11 @@ namespace MazeGenerator
                 int height = Convert.ToInt32(Console.ReadLine());*/
                 Console.Clear();
 
-                Maze maze = new Maze(/*width*/50, /*height*/50, 10);
+                Maze maze = new Maze(/*width*/50, /*height*/50);
 
                 Console.Clear();
 
-                printMaze(maze.maze, null, 5);
+                printMaze(maze.maze, null);
 
                 MazeSolver.SolveMaze(maze.maze);
 

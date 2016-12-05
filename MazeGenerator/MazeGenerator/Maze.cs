@@ -19,6 +19,9 @@ namespace MazeGenerator
         /// </summary>
         private int height;
 
+        private int[] enterDoorPos;
+        private int[] outDoorPos;
+
         // Constante pour stocker les noms des différentes directions
         public const string TOP = "top";
         public const string BOTTOM = "bottom";
@@ -111,11 +114,14 @@ namespace MazeGenerator
         private void GenerateMaze(int[,] mazeToGenerate, int? stepByStepLength = null)
         {
             // Génère le labyrinthe
-            GenerateMaze(random.Next(width), random.Next(height), mazeToGenerate, stepByStepLength);
+            GenerateMazeByKruskal(mazeToGenerate);
 
             // Choisi la position de l'entrée et de la sortie du labyrinthe
             int topDoorPos = random.Next(width);
             int bottomDoorPod = random.Next(width);
+
+            enterDoorPos = new int[] { topDoorPos, 0 };
+            outDoorPos = new int[] { bottomDoorPod, height - 1 };
 
             // Enregistre la porte à la bonne position
             mazeToGenerate[topDoorPos, 0] |= TBRL[TOP];
@@ -129,7 +135,7 @@ namespace MazeGenerator
         /// <param name="currentY">Position à la vertical de la dernière case visitée</param>
         /// <param name="mazeToGenerate">Labyrinthe à génèrer</param>
         /// <param name="stepByStep">Lance le labyrinthe en mode "Démo", et montre chaque étape de la génération</param>
-        private void GenerateMaze(int currentX, int currentY, int[,] mazeToGenerate, int? stepByStepLength)
+        private void GenerateMazeByRecursiveBacktracking(int currentX, int currentY, int[,] mazeToGenerate, int? stepByStepLength)
         {
             // Crée une liste avec les différentes directions possible
             List<string> directions = new List<string> { TOP, BOTTOM, LEFT, RIGHT };
@@ -163,12 +169,73 @@ namespace MazeGenerator
                     }
 
                     // Continue de génèrer le labyrinthe avec la case suivante
-                    GenerateMaze(nextX, nextY, mazeToGenerate, stepByStepLength);
+                    GenerateMazeByRecursiveBacktracking(nextX, nextY, mazeToGenerate, stepByStepLength);
                 }
 
                 // Supprime la direction pour de celle restante
                 directions.RemoveAt(randomDir);
             }
+        }
+
+        private void GenerateMazeByKruskal(int[,] mazeToGenerate)
+        {
+            int[,] mazeNumber = new int[mazeToGenerate.GetLength(0), mazeToGenerate.GetLength(1)];
+
+            for (int i = 0; i < mazeNumber.GetLength(0); i++)
+            {
+                for (int j = 0; j < mazeNumber.GetLength(1); j++)
+                {
+                    mazeNumber[i, j] = i * mazeNumber.GetLength(0) + j;
+                }
+            }
+
+            string[] directions = new string[] { TOP, BOTTOM, LEFT, RIGHT };
+
+            while (!MazeIsGeneratedByKruskal(mazeNumber))
+            {
+                int posX = random.Next(mazeNumber.GetLength(0));
+                int posY = random.Next(mazeNumber.GetLength(1));
+
+                string direction = directions[random.Next(4)];
+
+                int secondPosX = posX + differenceX[direction];
+                int secondPosY = posY + differenceY[direction];
+
+                if (secondPosX >= 0 && secondPosX < mazeNumber.GetLength(0) && secondPosY >= 0 && secondPosY < mazeNumber.GetLength(1) && mazeNumber[posX, posY] != mazeNumber[secondPosX, secondPosY])
+                {
+                    mazeToGenerate[posX, posY] |= TBRL[direction];
+                    mazeToGenerate[secondPosX, secondPosY] |= TBRL[REVERT_TBRL[direction]];
+
+                    int tmp = mazeNumber[secondPosX, secondPosY];
+
+                    for (int i = 0; i < mazeNumber.GetLength(0); i++)
+                    {
+                        for (int j = 0; j < mazeNumber.GetLength(1); j++)
+                        {
+                            if (mazeNumber[i, j] == tmp)
+                            {
+                                mazeNumber[i, j] = mazeNumber[posX, posY];
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        private bool MazeIsGeneratedByKruskal(int[,] mazeToCheck)
+        {
+            for (int i = 0; i < mazeToCheck.GetLength(0); i++)
+            {
+                for (int j = 0; j < mazeToCheck.GetLength(1); j++)
+                {
+                    if (mazeToCheck[i, j] != mazeToCheck[0, 0])
+                    {
+                        return false;
+                    }
+                }
+            }
+
+            return true;
         }
     }
 }
