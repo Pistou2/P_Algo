@@ -30,7 +30,7 @@ namespace MazeGenerator
                 int height = Convert.ToInt32(Console.ReadLine());*/
                 Console.Clear();
 
-                Maze maze = new Maze(/*width*/50, /*height*/50);
+                Maze maze = new Maze(/*width*/50, /*height*/50, Maze.GenerationType.Mixt, 2);
 
                 Console.Clear();
 

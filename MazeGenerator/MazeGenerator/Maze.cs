@@ -9,6 +9,8 @@ namespace MazeGenerator
 {
     partial class Maze
     {
+        public enum GenerationType { RecursiveBacktracking, GenerateMazeByKruskal, Mixt }
+
         /// <summary>
         /// Largeur du labyrinthe
         /// </summary>
@@ -88,7 +90,7 @@ namespace MazeGenerator
         /// <param name="width">Largeur du labyrinthe voulu</param>
         /// <param name="height">Hauteur du labyrinthe voulu</param>
         /// <param name="stepByStep">Lance le labyrinthe en mode "Démo", et montre chaque étape de la génération</param>
-        public Maze(int width, int height, int? stepByStepLength = null)
+        public Maze(int width, int height, GenerationType type = GenerationType.GenerateMazeByKruskal, int? stepByStepLength = null, bool withDoors = true)
         {
             // Enregistre la largeur et la hauteur
             this.width = width;
@@ -103,7 +105,7 @@ namespace MazeGenerator
             {
                 PrintMaze(maze);
             }
-            GenerateMaze(maze, stepByStepLength);
+            GenerateMaze(maze, type, stepByStepLength, withDoors);
         }
 
         /// <summary>
@@ -111,21 +113,59 @@ namespace MazeGenerator
         /// </summary>
         /// <param name="mazeToGenerate">Labyrinthe à générer</param>
         /// <param name="stepByStep">Lance le labyrinthe en mode "Démo", et montre chaque étape de la génération</param>
-        private void GenerateMaze(int[,] mazeToGenerate, int? stepByStepLength = null)
+        public void GenerateMaze(int[,] mazeToGenerate, GenerationType type = GenerationType.GenerateMazeByKruskal, int? stepByStepLength = null, bool withDoors = true)
         {
             // Génère le labyrinthe
-            GenerateMazeByKruskal(mazeToGenerate);
+            if (type == GenerationType.GenerateMazeByKruskal)
+            {
+                GenerateMazeByKruskal(mazeToGenerate, stepByStepLength);
 
-            // Choisi la position de l'entrée et de la sortie du labyrinthe
-            int topDoorPos = random.Next(width);
-            int bottomDoorPod = random.Next(width);
 
-            enterDoorPos = new int[] { topDoorPos, 0 };
-            outDoorPos = new int[] { bottomDoorPod, height - 1 };
+            }
+            else if (type == GenerationType.RecursiveBacktracking)
+            {
+                GenerateMazeByRecursiveBacktracking(random.Next(width), random.Next(height), mazeToGenerate, stepByStepLength);
+            }
 
-            // Enregistre la porte à la bonne position
-            mazeToGenerate[topDoorPos, 0] |= TBRL[TOP];
-            mazeToGenerate[bottomDoorPod, height - 1] |= TBRL[BOTTOM];
+            else if (type == GenerationType.Mixt)
+            {
+                //TODO
+                //divide the maze in 4 little mazes
+                Maze[] subMazes = new Maze[4];
+
+                subMazes[0] = new Maze(width / 2, height / 2, GenerationType.GenerateMazeByKruskal, stepByStepLength, false);
+                subMazes[1] = new Maze(width / 2, height / 2, GenerationType.RecursiveBacktracking, stepByStepLength, false);
+                subMazes[2] = new Maze(width / 2, height / 2, GenerationType.GenerateMazeByKruskal, stepByStepLength, false);
+                subMazes[3] = new Maze(width / 2, height / 2, GenerationType.RecursiveBacktracking, stepByStepLength, false);
+
+                Console.Clear();
+
+                //Regroup all the mazes in an unique maze
+
+                for (int i = 0; i < subMazes.Length; i++)
+                {
+                    for (int x = 0; x < subMazes[i].maze.GetLength(0); x++)
+                    {
+                        for (int y = 0; y < subMazes[i].maze.GetLength(1); y++)
+                        {
+                            maze[x + ((i % 2) * width / 2), y + (i / 2) * height / 2] = subMazes[i].maze[x, y];
+                        }
+                    }
+                }
+            }
+
+            if (withDoors)
+            {
+                // Choisi la position de l'entrée et de la sortie du labyrinthe
+                int topDoorPos = random.Next(width);
+                int bottomDoorPod = random.Next(width);
+                enterDoorPos = new int[] { topDoorPos, 0 };
+                outDoorPos = new int[] { bottomDoorPod, height - 1 };
+
+                // Enregistre la porte à la bonne position
+                mazeToGenerate[topDoorPos, 0] |= TBRL[TOP];
+                mazeToGenerate[bottomDoorPod, height - 1] |= TBRL[BOTTOM];
+            }
         }
 
         /// <summary>
@@ -135,7 +175,7 @@ namespace MazeGenerator
         /// <param name="currentY">Position à la vertical de la dernière case visitée</param>
         /// <param name="mazeToGenerate">Labyrinthe à génèrer</param>
         /// <param name="stepByStep">Lance le labyrinthe en mode "Démo", et montre chaque étape de la génération</param>
-        private void GenerateMazeByRecursiveBacktracking(int currentX, int currentY, int[,] mazeToGenerate, int? stepByStepLength)
+        public void GenerateMazeByRecursiveBacktracking(int currentX, int currentY, int[,] mazeToGenerate, int? stepByStepLength)
         {
             // Crée une liste avec les différentes directions possible
             List<string> directions = new List<string> { TOP, BOTTOM, LEFT, RIGHT };
@@ -165,7 +205,7 @@ namespace MazeGenerator
                     {
                         //écrit la case
                         PrintMaze(mazeToGenerate, new int[] { currentX, currentY });
-                        System.Threading.Thread.Sleep((int)stepByStepLength);
+                        Thread.Sleep((int)stepByStepLength);
                     }
 
                     // Continue de génèrer le labyrinthe avec la case suivante
@@ -177,7 +217,7 @@ namespace MazeGenerator
             }
         }
 
-        private void GenerateMazeByKruskal(int[,] mazeToGenerate)
+        private void GenerateMazeByKruskal(int[,] mazeToGenerate, int? stepByStepLength)
         {
             int[,] mazeNumber = new int[mazeToGenerate.GetLength(0), mazeToGenerate.GetLength(1)];
 
@@ -217,6 +257,12 @@ namespace MazeGenerator
                                 mazeNumber[i, j] = mazeNumber[posX, posY];
                             }
                         }
+                    }
+
+                    if (stepByStepLength != null)
+                    {
+                        PrintMaze(mazeToGenerate, new int[] { posX, posY });
+                        Thread.Sleep((int)stepByStepLength);
                     }
                 }
             }
