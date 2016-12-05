@@ -4,3 +4,4 @@ local.cs
 *.cache
 *.Cache
 *.pdb
+*TemporaryGeneratedFile*
