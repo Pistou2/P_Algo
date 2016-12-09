@@ -12,7 +12,7 @@ namespace MazeGenerator
         /// <summary>
         /// Les différents type de génération d'un labyrinthe
         /// </summary>
-        public enum GenerationType { RecursiveBacktracking, GenerateMazeByKruskal, Mixt }
+        public enum GenerationType { RecursiveBacktracking, Kruskal, Mixt }
 
         /// <summary>
         /// Largeur du labyrinthe
@@ -103,7 +103,7 @@ namespace MazeGenerator
         /// <param name="height">Hauteur du labyrinthe voulu</param>
         /// <param name="stepByStep">Lance le labyrinthe en mode "Démo", et montre chaque étape de la génération</param>
         /// <param name="withDoors">Défini si il faut généré un labyrinthe avec les portes d'entrée et de sortie</param>
-        public Maze(int width, int height, GenerationType type = GenerationType.GenerateMazeByKruskal, int? stepByStepLength = null)
+        public Maze(int width, int height, GenerationType type = GenerationType.Kruskal, int? stepByStepLength = null)
         {
             // Enregistre la largeur et la hauteur
             this.width = width;
@@ -127,12 +127,12 @@ namespace MazeGenerator
         /// </summary>
         /// <param name="mazeToGenerate">Labyrinthe à générer</param>
         /// <param name="stepByStep">Lance le labyrinthe en mode "Démo", et montre chaque étape de la génération</param>
-        public void GenerateMaze(int[,] mazeToGenerate, GenerationType type = GenerationType.GenerateMazeByKruskal, int? stepByStepLength = null)
+        public void GenerateMaze(int[,] mazeToGenerate, GenerationType type = GenerationType.Kruskal, int? stepByStepLength = null)
         {
             // Génère le labyrinthe avec la méthode voulue
             switch (type)
             {
-                case GenerationType.GenerateMazeByKruskal:
+                case GenerationType.Kruskal:
                     GenerateMazeByKruskal(mazeToGenerate, stepByStepLength);
                     break;
 
@@ -169,25 +169,28 @@ namespace MazeGenerator
             // Génère les 4 petits labyrinthes avec les deux méthodes de génération
             GenerateMazeByKruskal(subMazes[0], stepByStepLength);
             GenerateMazeByRecursiveBacktracking(random.Next(subMazes[1].GetLength(0)), random.Next(subMazes[1].GetLength(1)), subMazes[1], stepByStepLength);
-            GenerateMazeByRecursiveBacktracking(random.Next(subMazes[2].GetLength(0)), random.Next(subMazes[2].GetLength(0)), subMazes[2], stepByStepLength);
+            GenerateMazeByRecursiveBacktracking(random.Next(subMazes[2].GetLength(0)), random.Next(subMazes[2].GetLength(1)), subMazes[2], stepByStepLength);
             GenerateMazeByKruskal(subMazes[3], stepByStepLength);
 
             for (int i = 0; i < 3; i++)
             {
-                int tmp = random.Next(subMazes[i].GetLength(i % 2));
+                int tmp;
 
                 if (i == 0)
                 {
+                    tmp = random.Next(subMazes[0].GetLength(0));
                     subMazes[0][tmp, height / 2 + (height % 2) - 1] |= TBRL[BOTTOM];
                     subMazes[2][tmp, 0] |= TBRL[TOP];
                 }
                 else if (i == 1)
                 {
+                    tmp = random.Next(subMazes[0].GetLength(1));
                     subMazes[0][width / 2 + (width % 2) - 1, tmp] |= TBRL[RIGHT];
                     subMazes[1][0, tmp] |= TBRL[LEFT];
                 }
                 else if (i == 2)
                 {
+                    tmp = random.Next(subMazes[1].GetLength(0));
                     subMazes[1][tmp, height / 2 + (height % 2) - 1] |= TBRL[BOTTOM];
                     subMazes[3][tmp, 0] |= TBRL[TOP];
                 }
@@ -270,7 +273,7 @@ namespace MazeGenerator
             {
                 for (int j = 0; j < mazeNumber.GetLength(1); j++)
                 {
-                    mazeNumber[i, j] = i * mazeNumber.GetLength(0) + j;
+                    mazeNumber[i, j] = i * mazeNumber.GetLength(1) + j;
                 }
             }
 
