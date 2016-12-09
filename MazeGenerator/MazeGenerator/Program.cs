@@ -30,16 +30,18 @@ namespace MazeGenerator
                 int height = Convert.ToInt32(Console.ReadLine());*/
                 Console.Clear();
 
-                Maze maze = new Maze(/*width*/49, /*height*/49, Maze.GenerationType.Mixt, 2);
+                Maze maze = new Maze(/*width*/19, /*height*/19, Maze.GenerationType.Mixt, 2);
 
                 Console.Clear();
 
-                Maze.PrintMaze(maze.maze, null);
+                Maze.PrintMaze(maze.maze);
 
-                //Maze.SolveMaze(maze);
+                Maze.SolveMaze(maze, 10);
+
+                //Maze.ShowSolution(maze, ConsoleColor.Red, 100);
 
                 //Thread.Sleep(5000);
-                
+
                 Console.ReadLine();
             }
         }
