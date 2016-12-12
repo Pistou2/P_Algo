@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace MazeGenerator
 {
@@ -421,10 +418,10 @@ namespace MazeGenerator
         /// <param name="stepByStepLength">Lance le labyrinthe en mode "Démo", et montre chaque étape de la génération</param>
         /// <param name="iteration">Nombre de fois que la methode est appelée</param>
         /// <param name="number">Nombre de la première case appelée pour mettre toutes les autres au même (comme dans Kruskal)</param>
-        private static int GenerateMazeByMixt(int currentX, int currentY, int[,] mazeToGenerate, int[,] mazeNumber, int? stepByStepLength, int iteration, int number)
+        private static void GenerateMazeByMixt(int currentX, int currentY, int[,] mazeToGenerate, int[,] mazeNumber, int? stepByStepLength, int iteration, int number)
         {
-            // Nombre de case dont il faut revenir en arrière
-            int numberToGo = 0;
+            // Si une direction a été choisie pour continuer
+            bool haveChooseCorrectDirection = false;
 
             // Change la valeur de la case pour celle actuel
             mazeNumber[currentX, currentY] = number;
@@ -432,8 +429,8 @@ namespace MazeGenerator
             // Crée une liste avec les différentes directions possible
             List<string> directions = new List<string> { TOP, BOTTOM, LEFT, RIGHT };
 
-            // Tant qu'il y a encore des directions à regarder
-            while (directions.Count != 0 && numberToGo == 0)
+            // Tant qu'il y a encore des directions à regarder et qu'il n'en a pas déjà prise une
+            while (directions.Count != 0 && !haveChooseCorrectDirection)
             {
                 // Choisi aléatoirement une des directions restantes
                 int randomDir = random.Next(directions.Count);
@@ -452,24 +449,24 @@ namespace MazeGenerator
                     // Change la valeur de la case suivantes pour indiquer qu'une porte a été crée dans la direction (inversée par rapport à la case actuelle)
                     mazeToGenerate[nextX, nextY] |= TBRL[REVERT_TBRL[direction]];
 
-                    //Step by step
+                    // Step by step
                     if (stepByStepLength != null)
                     {
-                        //écrit la case
+                        // Ecrit la case
                         PrintMaze(mazeToGenerate, new int[] { currentX, currentY });
                         Thread.Sleep((int)stepByStepLength);
                     }
 
                     // Continue de génèrer le labyrinthe avec la case suivante
-                    numberToGo = GenerateMazeByMixt(nextX, nextY, mazeToGenerate, mazeNumber, stepByStepLength, iteration + 1, number);
+                    haveChooseCorrectDirection = true;
+
+                    // Génère la suite du labyrinthe
+                    GenerateMazeByMixt(nextX, nextY, mazeToGenerate, mazeNumber, stepByStepLength, iteration + 1, number);
                 }
 
                 // Supprime la direction pour de celle restante
                 directions.RemoveAt(randomDir);
             }
-
-            // Retourne le nombre de case dont il faut retourner en arrière
-            return numberToGo == 0 ? random.Next(iteration) : numberToGo;
         }
 
         /// <summary>
