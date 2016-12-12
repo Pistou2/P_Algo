@@ -45,7 +45,7 @@ namespace MazeGenerator
         /// <summary>
         /// Dictionnaire avec la différence en case horizontalement suivant la direction voulue
         /// </summary>
-        public static Dictionary<string, int> differenceX = new Dictionary<string, int>()
+        public static Dictionary<string, int> DIFFERENCE_X = new Dictionary<string, int>()
         {
             { TOP, 0 },
             { BOTTOM, 0 },
@@ -56,7 +56,7 @@ namespace MazeGenerator
         /// <summary>
         /// Dictionnaire avec la différence en case verticalement suivant la direction voulue
         /// </summary>
-        public static Dictionary<string, int> differenceY = new Dictionary<string, int>()
+        public static Dictionary<string, int> DIFFRENCE_Y = new Dictionary<string, int>()
         {
             { TOP, -1 },
             { BOTTOM, 1 },
@@ -94,15 +94,15 @@ namespace MazeGenerator
         /// <summary>
         /// Random pour généré le labyrinthe
         /// </summary>
-        Random random = new Random();
+        static Random random = new Random();
 
         /// <summary>
         /// Constructeur de la classe
         /// </summary>
         /// <param name="width">Largeur du labyrinthe voulu</param>
         /// <param name="height">Hauteur du labyrinthe voulu</param>
-        /// <param name="stepByStep">Lance le labyrinthe en mode "Démo", et montre chaque étape de la génération</param>
-        /// <param name="withDoors">Défini si il faut généré un labyrinthe avec les portes d'entrée et de sortie</param>
+        /// <param name="type">Type de génération du labyrinthe, par défaut Kruskal</param>
+        /// <param name="stepByStepLength">Lance le labyrinthe en mode "Démo", et montre chaque étape de la génération</param>
         public Maze(int width, int height, GenerationType type = GenerationType.Kruskal, int? stepByStepLength = null)
         {
             // Enregistre la largeur et la hauteur
@@ -119,47 +119,68 @@ namespace MazeGenerator
             }
 
             // Génère le labyrinthe
-            GenerateMaze(maze, type, stepByStepLength);
+            GenerateMaze(this, type, stepByStepLength);
         }
 
         /// <summary>
         /// Génère un labyrinthe
         /// </summary>
         /// <param name="mazeToGenerate">Labyrinthe à générer</param>
+        /// <param name="stepByStepLength">Méthode de génération du l</param>
         /// <param name="stepByStep">Lance le labyrinthe en mode "Démo", et montre chaque étape de la génération</param>
-        public void GenerateMaze(int[,] mazeToGenerate, GenerationType type = GenerationType.Kruskal, int? stepByStepLength = null)
+        public static void GenerateMaze(Maze mazeToGenerate, GenerationType type = GenerationType.Kruskal, int? stepByStepLength = null)
         {
+            // Regénère le labyrinthe de zéro s'il le faut
+            if (mazeToGenerate.maze[0, 0] != 0)
+            {
+                mazeToGenerate.maze = new int[mazeToGenerate.width, mazeToGenerate.height];
+
+                // L'affiche une première fois pour un step by step
+                if (stepByStepLength != null)
+                {
+                    PrintMaze(mazeToGenerate.maze);
+                }
+            }
+
             // Génère le labyrinthe avec la méthode voulue
             switch (type)
             {
                 case GenerationType.Kruskal:
-                    GenerateMazeByKruskal(mazeToGenerate, stepByStepLength);
+                    GenerateMazeByKruskal(mazeToGenerate.maze, stepByStepLength);
                     break;
 
                 case GenerationType.RecursiveBacktracking:
-                    GenerateMazeByRecursiveBacktracking(random.Next(width), random.Next(height), mazeToGenerate, stepByStepLength);
+                    GenerateMazeByRecursiveBacktracking(random.Next(mazeToGenerate.width), random.Next(mazeToGenerate.height), mazeToGenerate.maze, stepByStepLength);
                     break;
 
                 case GenerationType.Mixt:
-                    GenrateMazeMixt(mazeToGenerate, stepByStepLength);
+                    GenrateMazeMixt(mazeToGenerate.maze, stepByStepLength);
                     break;
             }
 
             // Choisi la position de l'entrée et de la sortie du labyrinthe
-            int topDoorPos = random.Next(width);
-            int bottomDoorPod = random.Next(width);
-            enterDoorPos = new int[] { topDoorPos, 0 };
-            outDoorPos = new int[] { bottomDoorPod, height - 1 };
+            int topDoorPos = random.Next(mazeToGenerate.width);
+            int bottomDoorPod = random.Next(mazeToGenerate.width);
+            mazeToGenerate.enterDoorPos = new int[] { topDoorPos, 0 };
+            mazeToGenerate.outDoorPos = new int[] { bottomDoorPod, mazeToGenerate.height - 1 };
 
             // Enregistre la porte à la bonne position
-            mazeToGenerate[topDoorPos, 0] |= TBRL[TOP];
-            mazeToGenerate[bottomDoorPod, height - 1] |= TBRL[BOTTOM];
+            mazeToGenerate.maze[topDoorPos, 0] |= TBRL[TOP];
+            mazeToGenerate.maze[bottomDoorPod, mazeToGenerate.height - 1] |= TBRL[BOTTOM];
         }
 
-        private void GenrateMazeMixt(int[,] mazeToGenerate, int? stepByStepLength)
+        /// <summary>
+        /// Génère un labyrinthe avec les deux méthodes
+        /// </summary>
+        /// <param name="mazeToGenerate">Tableau du labyrinthe à générer</param>
+        /// <param name="stepByStepLength">Lance le labyrinthe en mode "Démo", et montre chaque étape de la génération</param>
+        private static void GenrateMazeMixt(int[,] mazeToGenerate, int? stepByStepLength)
         {
             // Divise le labyrinthe en 4 petits labyrinthes
-            int[][,] subMazes = new int[4][,];
+            /*int[][,] subMazes = new int[4][,];
+
+            int width = mazeToGenerate.GetLength(0);
+            int height = mazeToGenerate.GetLength(1);
 
             subMazes[0] = new int[width / 2 + (width % 2), height / 2 + (height % 2)];
             subMazes[1] = new int[width / 2, height / 2 + (height % 2)];
@@ -203,10 +224,27 @@ namespace MazeGenerator
                 {
                     for (int y = 0; y < subMazes[i].GetLength(1); y++)
                     {
-                        maze[x + ((i % 2) * width / 2 + (width % 2 & i % 2)), y + (i / 2) * height / 2 + (height % 2 & i / 2)] = subMazes[i][x, y];
+                        mazeToGenerate[x + ((i % 2) * width / 2 + (width % 2 & i % 2)), y + (i / 2) * height / 2 + (height % 2 & i / 2)] = subMazes[i][x, y];
                     }
                 }
+            }*/
+
+            int x = 0;
+            int[,] mazeNumber = new int[mazeToGenerate.GetLength(0), mazeToGenerate.GetLength(1)];
+
+            // Initilise le tableau avec le numéro de la case
+            for (int i = 0; i < mazeNumber.GetLength(0); i++)
+            {
+                for (int j = 0; j < mazeNumber.GetLength(1); j++)
+                {
+                    mazeNumber[i, j] = i * mazeNumber.GetLength(1) + j;
+                }
             }
+
+            int w = random.Next(mazeToGenerate.GetLength(0));
+            int z = random.Next(mazeToGenerate.GetLength(1));
+
+            GenerateMazeByMixt(w, z, mazeToGenerate, mazeNumber, stepByStepLength, ref x, 0, mazeNumber[w, z]);
         }
 
         /// <summary>
@@ -216,7 +254,7 @@ namespace MazeGenerator
         /// <param name="currentY">Position à la vertical de la dernière case visitée</param>
         /// <param name="mazeToGenerate">Labyrinthe à génèrer</param>
         /// <param name="stepByStep">Lance le labyrinthe en mode "Démo", et montre chaque étape de la génération</param>
-        private void GenerateMazeByRecursiveBacktracking(int currentX, int currentY, int[,] mazeToGenerate, int? stepByStepLength)
+        private static void GenerateMazeByRecursiveBacktracking(int currentX, int currentY, int[,] mazeToGenerate, int? stepByStepLength)
         {
             // Crée une liste avec les différentes directions possible
             List<string> directions = new List<string> { TOP, BOTTOM, LEFT, RIGHT };
@@ -229,8 +267,8 @@ namespace MazeGenerator
                 string direction = directions[randomDir];
 
                 // Calcule la position de la case suivante à regarder
-                int nextX = currentX + differenceX[direction];
-                int nextY = currentY + differenceY[direction];
+                int nextX = currentX + DIFFERENCE_X[direction];
+                int nextY = currentY + DIFFRENCE_Y[direction];
 
                 // Si la case n'est pas au bord du labyrinthe et qu'elle n'a pas encore été visitée
                 if (nextX >= 0 && nextX < mazeToGenerate.GetLength(0) && nextY >= 0 && nextY < mazeToGenerate.GetLength(1) && mazeToGenerate[nextX, nextY] == 0)
@@ -263,7 +301,7 @@ namespace MazeGenerator
         /// </summary>
         /// <param name="mazeToGenerate">Labyrinthe à génèrer</param>
         /// <param name="stepByStepLength">Lance le labyrinthe en mode "Démo", et montre chaque étape de la génération</param>
-        private void GenerateMazeByKruskal(int[,] mazeToGenerate, int? stepByStepLength)
+        private static void GenerateMazeByKruskal(int[,] mazeToGenerate, int? stepByStepLength)
         {
             // Crée une tableau de la taille du labyrinthe à générer pour stocker les nombres de chaque case
             int[,] mazeNumber = new int[mazeToGenerate.GetLength(0), mazeToGenerate.GetLength(1)];
@@ -291,8 +329,8 @@ namespace MazeGenerator
                 string direction = directions[random.Next(4)];
 
                 // Calcul la position de la deuxième case suivant la direction voulue
-                int secondPosX = posX + differenceX[direction];
-                int secondPosY = posY + differenceY[direction];
+                int secondPosX = posX + DIFFERENCE_X[direction];
+                int secondPosY = posY + DIFFRENCE_Y[direction];
 
                 // Vérifie que la position de la deuxième case se trouve dans les limites du labyrinthe et que le numéro des deux cases ne sont pas égale
                 if (secondPosX >= 0 && secondPosX < mazeNumber.GetLength(0) && secondPosY >= 0 && secondPosY < mazeNumber.GetLength(1) && mazeNumber[posX, posY] != mazeNumber[secondPosX, secondPosY])
@@ -331,7 +369,7 @@ namespace MazeGenerator
         /// </summary>
         /// <param name="mazeNumberToCheck">Tableau des numéros des cases d'un labyrinthe généré avec Kruskal</param>
         /// <returns>Si le labyrinthe est terminé</returns>
-        private bool MazeIsGeneratedByKruskal(int[,] mazeNumberToCheck)
+        private static bool MazeIsGeneratedByKruskal(int[,] mazeNumberToCheck)
         {
             // Vérifie pour chaque case si le numéro et égale à celui de la première
             for (int i = 0; i < mazeNumberToCheck.GetLength(0); i++)
@@ -347,6 +385,134 @@ namespace MazeGenerator
             }
 
             // Retourne que le labyrinthe est terminé
+            return true;
+        }
+
+        /// <summary>
+        /// Génère un labyrinthe avec la méthode de l'exploration exhaustive
+        /// </summary>
+        /// <param name="currentX">Position à l'hotizontal de la dernière case visitée</param>
+        /// <param name="currentY">Position à la vertical de la dernière case visitée</param>
+        /// <param name="mazeToGenerate">Labyrinthe à génèrer</param>
+        /// <param name="stepByStep">Lance le labyrinthe en mode "Démo", et montre chaque étape de la génération</param>
+        private static void GenerateMazeByMixt(int currentX, int currentY, int[,] mazeToGenerate, int[,] mazeNumber, int? stepByStepLength, ref int numberToGo, int iteration, int number)
+        {
+            mazeNumber[currentX, currentY] = number;
+
+            // Crée une liste avec les différentes directions possible
+            List<string> directions = new List<string> { TOP, BOTTOM, LEFT, RIGHT };
+
+            if (numberToGo == 0)
+            {
+                // Tant qu'il y a encore des directions à regarder
+                while (directions.Count != 0 && numberToGo == 0)
+                {
+                    // Choisi aléatoirement une des directions restantes
+                    int randomDir = random.Next(directions.Count);
+                    string direction = directions[randomDir];
+
+                    // Calcule la position de la case suivante à regarder
+                    int nextX = currentX + DIFFERENCE_X[direction];
+                    int nextY = currentY + DIFFRENCE_Y[direction];
+
+                    // Si la case n'est pas au bord du labyrinthe et qu'elle n'a pas encore été visitée
+                    if (nextX >= 0 && nextX < mazeToGenerate.GetLength(0) && nextY >= 0 && nextY < mazeToGenerate.GetLength(1) && mazeToGenerate[nextX, nextY] == 0)
+                    {
+                        // Change la valeur de la case actuel pour indiquer qu'une porte a été crée dans la direction
+                        mazeToGenerate[currentX, currentY] |= TBRL[direction];
+
+                        // Change la valeur de la case suivantes pour indiquer qu'une porte a été crée dans la direction (inversée par rapport à la case actuelle)
+                        mazeToGenerate[nextX, nextY] |= TBRL[REVERT_TBRL[direction]];
+
+                        //Step by step
+                        if (stepByStepLength != null)
+                        {
+                            //écrit la case
+                            PrintMaze(mazeToGenerate, new int[] { currentX, currentY });
+                            Thread.Sleep((int)stepByStepLength);
+                        }
+
+                        // Continue de génèrer le labyrinthe avec la case suivante
+                        GenerateMazeByMixt(nextX, nextY, mazeToGenerate, mazeNumber, stepByStepLength, ref numberToGo, iteration + 1, number);
+                    }
+
+                    // Supprime la direction pour de celle restante
+                    directions.RemoveAt(randomDir);
+                }
+            }
+
+            numberToGo = random.Next(iteration);
+
+            if (iteration == 0)
+            {
+                while (!isGenerated(mazeToGenerate))
+                {
+                    currentX = random.Next(mazeToGenerate.GetLength(0));
+                    currentY = random.Next(mazeToGenerate.GetLength(1));
+
+                    numberToGo = 0;
+                    GenerateMazeByMixt(currentX, currentY, mazeToGenerate, mazeNumber, stepByStepLength, ref numberToGo, iteration + 1, mazeNumber[currentX, currentY]);
+                }
+
+                directions = new List<string>() { TOP, BOTTOM, LEFT, RIGHT };
+
+                // Fait la boucle tant que le labyrinthe n'est pas fini
+                while (!MazeIsGeneratedByKruskal(mazeNumber))
+                {
+                    // Choisi des positions pour une case à ouvrir
+                    int posX = random.Next(mazeNumber.GetLength(0));
+                    int posY = random.Next(mazeNumber.GetLength(1));
+
+                    // Choisi une direction aléatoire
+                    string direction = directions[random.Next(4)];
+
+                    // Calcul la position de la deuxième case suivant la direction voulue
+                    int secondPosX = posX + DIFFERENCE_X[direction];
+                    int secondPosY = posY + DIFFRENCE_Y[direction];
+
+                    // Vérifie que la position de la deuxième case se trouve dans les limites du labyrinthe et que le numéro des deux cases ne sont pas égale
+                    if (secondPosX >= 0 && secondPosX < mazeNumber.GetLength(0) && secondPosY >= 0 && secondPosY < mazeNumber.GetLength(1) && mazeNumber[posX, posY] != mazeNumber[secondPosX, secondPosY])
+                    {
+                        // Enregistre la position de la porte ouverte dans les deux cases
+                        mazeToGenerate[posX, posY] |= TBRL[direction];
+                        mazeToGenerate[secondPosX, secondPosY] |= TBRL[REVERT_TBRL[direction]];
+
+                        // Enregistre le numéro de la deuxième case pour changer les numéros de chaque case égale
+                        int tmp = mazeNumber[secondPosX, secondPosY];
+
+                        // Vérifie le numéro de chaque case et change celle voulue
+                        for (int i = 0; i < mazeNumber.GetLength(0); i++)
+                        {
+                            for (int j = 0; j < mazeNumber.GetLength(1); j++)
+                            {
+                                if (mazeNumber[i, j] == tmp)
+                                {
+                                    mazeNumber[i, j] = mazeNumber[posX, posY];
+                                }
+                            }
+                        }
+
+                        // Affiche le pas par pas du labyrinthe si voulu
+                        if (stepByStepLength != null)
+                        {
+                            PrintMaze(mazeToGenerate, new int[] { posX, posY });
+                            Thread.Sleep((int)stepByStepLength);
+                        }
+                    }
+                }
+            }
+        }
+
+        private static bool isGenerated(int[,] maze)
+        {
+            foreach (int i in maze)
+            {
+                if (i == 0)
+                {
+                    return false;
+                }
+            }
+
             return true;
         }
     }

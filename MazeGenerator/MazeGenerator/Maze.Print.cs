@@ -53,6 +53,7 @@ namespace MazeGenerator
             // S'il faut regénérer une case
             if (_caseCorrdsForMonoPrint != null)
             {
+                mut.WaitOne();
                 // Efface tous les murs au tours de la case
                 for (int x = 0; x <= SIZE; x++)
                 {
@@ -86,6 +87,7 @@ namespace MazeGenerator
                     // Affiche la case d'en bas pour affiche le coins en bas à gauche et le mur d'en bas
                     ShowCase(_maze, _caseCorrdsForMonoPrint[0], _caseCorrdsForMonoPrint[1] + 1);
                 }
+                mut.ReleaseMutex();
             }
 
             else
@@ -257,7 +259,7 @@ namespace MazeGenerator
             // Affiche un lien entre la position actuel et la précédente si besoin
             if (direction != null)
             {
-                Console.SetCursorPosition(_x * SIZE + 1 + differenceX[REVERT_TBRL[direction]], _y * SIZE + 1 + differenceY[REVERT_TBRL[direction]]);
+                Console.SetCursorPosition(_x * SIZE + 1 + DIFFERENCE_X[REVERT_TBRL[direction]], _y * SIZE + 1 + DIFFRENCE_Y[REVERT_TBRL[direction]]);
                 Console.Write(" ");
             }
 

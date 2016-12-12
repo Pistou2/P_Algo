@@ -8,11 +8,13 @@ using System.Threading.Tasks;
 namespace MazeGenerator
 {
     partial class Maze
-    {        /// <summary>
-             /// Résoud un labyrinthe
-             /// </summary>
-             /// <param name="mazeToSolve">Labyrinthe à résoudre</param>
-             /// <returns>List des positions des cases où il faut passer pour résoudre le labyrinthe</returns>
+    {
+        /// <summary>
+        /// Résoud un labyrinthe
+        /// </summary>
+        /// <param name="mazeToSolve">Labyrinthe à résoudre</param>
+        /// <param name="printTime">Pour le pas par pas, temp à attendre entre chaque action</param>
+        /// <returns>List des positions des cases où il faut passer pour résoudre le labyrinthe</returns>
         public static List<object[]> SolveMaze(Maze mazeToSolve, int? printTime = null)
         {
             // Crée une liste où sera stocker les cases de la solution
@@ -48,13 +50,18 @@ namespace MazeGenerator
         /// <param name="currentY">La position verticale de la case actuel</param>
         /// <param name="solvedList">List avec les positions de solution</param>
         /// <param name="isEnded">Si on est arrivé à la fin du labyrinthe</param>
+        /// <param name="mustGoRight">S'il doit suivre le mur de droite</param>
+        /// <param name="printTime">Pour le pas par pas, temp à attendre entre chaque action</param>
+        /// <param name="inProgressColor">Couleur à afficher pour le mouvement de la solution</param>
+        /// <param name="passtColor">Couleur quand on revient en arrière</param>
+        /// <param name="solveColor">Couleur de la solution</param>
         private static void SolveMaze(Maze mazeToSolve, string lastDirection, int currentX, int currentY, List<object[]> solvedList, ref bool isEnded, bool mustGoRight, int? printTime,
             ConsoleColor inProgressColor, ConsoleColor passtColor, ConsoleColor solveColor)
         {
             // Crée une liste qui contiendra les directions dans l'ordre où il faut regardé
             List<string> directions = new List<string>();
 
-            // Enregistre la direction des prochaines cases suivant la direction comme on est rentré dans la case actuel
+            // Enregistre la direction des prochaines cases suivant la direction dans laquelle on est rentré dans la case actuel
             switch (lastDirection)
             {
                 case Maze.TOP:
@@ -97,8 +104,8 @@ namespace MazeGenerator
                 if ((mazeToSolve.maze[currentX, currentY] & Maze.TBRL[directions[mustGoRight ? 0 : directions.Count - 1]]) == Maze.TBRL[directions[mustGoRight ? 0 : directions.Count - 1]])
                 {
                     // Enregistre la position de la case suivante
-                    int nextX = currentX + Maze.differenceX[directions[mustGoRight ? 0 : directions.Count - 1]];
-                    int nextY = currentY + Maze.differenceY[directions[mustGoRight ? 0 : directions.Count - 1]];
+                    int nextX = currentX + Maze.DIFFERENCE_X[directions[mustGoRight ? 0 : directions.Count - 1]];
+                    int nextY = currentY + Maze.DIFFRENCE_Y[directions[mustGoRight ? 0 : directions.Count - 1]];
 
                     // Si la case suivante existe
                     if (nextX >= 0 && nextX < mazeToSolve.maze.GetLength(0) && nextY >= 0 && nextY < mazeToSolve.maze.GetLength(1))
@@ -148,6 +155,9 @@ namespace MazeGenerator
         /// <summary>
         /// Affiche la solution du labyrinthe
         /// </summary>
+        /// <param name="mazeToShowSolution">Labyrinthe dont il faut montrer la solution</param>
+        /// <param name="solutionColor">Couleur pour la solution</param>
+        /// <param name="printTime">Temps entre chaque action</param>
         public static void ShowSolution(Maze mazeToShowSolution, ConsoleColor solutionColor, int? printTime)
         {
             // Obtient la solution du labyrinthe

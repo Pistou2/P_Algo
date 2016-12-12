@@ -8,23 +8,29 @@ using System.Threading.Tasks;
 
 namespace MazeGenerator
 {
-    // 1 1 1 1
     class Program
     {
         static void Main(string[] args)
         {
+
             Console.ReadLine();
-            Console.SetWindowSize(208, 123);
+            Console.SetWindowSize(Console.LargestWindowWidth, Console.LargestWindowHeight);
+            Console.SetBufferSize(Console.LargestWindowWidth, Console.LargestWindowHeight);
+
+            Console.Write("Largeur: ");
+            int width = Convert.ToInt32(Console.ReadLine());
+
+            Console.Write("Hauteur: ");
+            int height = Convert.ToInt32(Console.ReadLine());
+
+            Console.Write("Type: ");
+            int type = Convert.ToInt32(Console.ReadLine());
+
+            Console.Clear();
+
             while (true)
             {
-                /*Console.Write("Largeur: ");
-                int width = Convert.ToInt32(Console.ReadLine());
-
-                Console.Write("Hauteur: ");
-                int height = Convert.ToInt32(Console.ReadLine());
-                Console.Clear();*/
-
-                Maze maze = new Maze(/*width*/103, /*height*/60, Maze.GenerationType.Mixt, 0);
+                Maze maze = new Maze(width, height, (Maze.GenerationType)type, 10);
 
                 Console.Clear();
 
