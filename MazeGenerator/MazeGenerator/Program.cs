@@ -26,17 +26,23 @@ namespace MazeGenerator
             Console.Write("Type: ");
             int type = Convert.ToInt32(Console.ReadLine());
 
+            Console.Write("Vitesse de génération : ");
+            int generateSpeed = Convert.ToInt32(Console.ReadLine());
+
+            Console.Write("Vitesse de résolution : ");
+            int solveSpeed = Convert.ToInt32(Console.ReadLine());
+
             Console.Clear();
 
             while (true)
             {
-                Maze maze = new Maze(width, height, (Maze.GenerationType)type, 10);
+                Maze maze = new Maze(width, height, (Maze.GenerationType)type, generateSpeed);
 
                 Console.Clear();
 
                 Maze.PrintMaze(maze.maze);
 
-                Maze.SolveMaze(maze, 0);
+                Maze.SolveMaze(maze, solveSpeed);
 
                 //Maze.ShowSolution(maze, ConsoleColor.Red, 100);
 
